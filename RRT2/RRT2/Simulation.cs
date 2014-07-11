@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
+
 
 public static class Simulation
 {
@@ -33,10 +35,10 @@ public static class Simulation
 //	private static int[] init_enemies_att = {1,1,1,2,2,2};
 	
 	/* 5v5 */
-//	private static int[] init_players = {20,20,20,20,20};
-//	private static int[] init_players_att = {2,2,2,2,2};
-//	private static int[] init_enemies = {10,10,10,6,6};
-//	private static int[] init_enemies_att = {1,1,1,2,2};
+	//	private static int[] init_players = {20,20,20,20,20};
+	//	private static int[] init_players_att = {2,2,2,2,2};
+	//	private static int[] init_enemies = {10,10,10,6,6};
+	//	private static int[] init_enemies_att = {1,1,1,2,2};
 	
 	/* 7v6 */
 //	private static int[] init_players = {80,45,45,45,29,29,29};
@@ -226,7 +228,7 @@ public static class Simulation
 	
 	static private void runRRT()
 	{
-		int K =2000;
+		int K =5000;
 		List<Node> graph = new List<Node>();
 		Node root = new Node(players, enemies);
 		graph.Add(root);
@@ -235,23 +237,112 @@ public static class Simulation
 		{
 			Node sample = sampleNode(rand);
 			connect(sample, graph, root);
-			//Console.WriteLine (sample.toString());
 		}
+		
+		//Choose best path
 		double minValue = double.MaxValue;
 		Node best = root;
 		foreach(Node nn in graph)
-		{
-			
-			Console.WriteLine(nn.toString());
+		{			
 			double val = nn.enemies.Sum();
 			if (minValue > val)
 			{
 				minValue = val;
 				best = nn;
+			} else if (minValue == val)
+			{
+				if (nn.players.Sum() > best.players.Sum())
+				{
+					best = nn;
+				}
 			}
+			
+			foreach(Node nnChild in nn.getChildren())
+			{			
+				double childval = nnChild.enemies.Sum();
+				if (minValue > childval)
+				{
+					minValue = childval;
+					best = nnChild;
+				} else if (minValue == childval)
+				{
+					if (nnChild.players.Sum() > best.players.Sum())
+					{
+						best = nnChild;
+					}
+				}
+			}
+			
 		}
+		addNode(graph, best);
+		markOptimal(best);
 		Console.WriteLine("RRT graph size: " + graph.Count);
 		printNodePath(best, 0, new List<Node>());
+		Console.WriteLine("Player team total Health: " + best.players.Sum());
+		outputGraph(graph, root);
+	}
+	
+	static private void markOptimal(Node best)
+	{
+		best.isOptimal = true;
+		if (best.parent != null)
+		{
+			markOptimal(best.parent);
+		}
+	}
+	
+	static private void outputGraph(List<Node> graph, Node root) 
+	{
+		foreach(Node n in graph)
+		{
+			if (n.parent != null)
+			{
+				n.parent.rrtChildren.Add(n);
+			}
+		}
+		string lines = outputNode(root, 0);
+		FileStream fcreate = File.Open("C:\\Users\\lenovo\\Desktop\\Research\\Project\\research\\Visualization\\data.json", FileMode.Create);
+		StreamWriter file = new StreamWriter(fcreate);
+		file.WriteLine(lines);
+		Console.Write("HERE");
+		file.Close();
+	}
+	
+	static private string outputNode(Node node, int level)
+	{
+		string output = "\r\n" + indent(level) + "{\r\n";
+		
+		level++;
+		output += indent(level) + "\"name\": \"" + node.players.Sum() + "-"+node.enemies.Sum() + "\"";
+		if (node.isOptimal) 
+		{
+			output += ",\r\n" + indent(level) + "\"optimal\": " + "1";
+		} else 
+		{
+			output += ",\r\n" + indent(level) + "\"optimal\": " + "0";
+		}
+		if (node.rrtChildren.Count > 0) 
+		{
+			output += ",\r\n" + indent(level) + "\"children\": " + "[";
+			
+			foreach (Node child in node.rrtChildren)
+			{
+				output += "\t" + outputNode(child, level) + ",";
+			}
+			output = output.Substring(0, output.Length - 1);
+			output += "\r\n" + indent(level) + "]";
+		}
+		output += "\r\n" + indent(level-1) + "}";
+		return output;
+	}
+	
+	static private string indent(int level)
+	{
+		string indent = "";
+		for (int i = 0; i < level; i++) {
+			indent += "\t";
+		}
+		return indent;
 	}
 	
 	static private void printNodePath(Node n, int count, List<Node> path)
@@ -285,7 +376,7 @@ public static class Simulation
 		}
 		for (int j = 0; j < enemies.Length; j++)
 		{
-			int randEnemy = 0;//rand.Next (enemies[j]);
+			int randEnemy = rand.Next (enemies[j]);
 			randEnemies[j] = randEnemy;
 		}
 		return new Node(randPlayers,randEnemies);
@@ -297,13 +388,13 @@ public static class Simulation
 		List<Node> validNodes = new List<Node>();
 		foreach (Node node in graph) 
 		{
-			if (isNodeSmaller(candidate, node))
+			if (isNodeEqualSmaller(candidate, node))
 			{
 				validNodes.Add(node);
 			}			
 			foreach (Node child in node.getChildren())
 			{
-				if (isNodeSmaller(candidate, child))
+				if (isNodeEqualSmaller(candidate, child))
 				{
 					validNodes.Add(child);
 				}
@@ -329,36 +420,36 @@ public static class Simulation
 	static private double findDistance(Node fromNode, Node toNode) 
 	{
 		double distance = 0;
-		/* methoed - manhattan distance */
-//		for(int i = 0; i < fromNode.players.Length; i++)
-//		{
-//			distance += Math.Sqrt(fromNode.players[i] - toNode.players[i]);
-//		}
-//		for(int i = 0; i < fromNode.enemies.Length; i++)
-//		{
-//			distance += Math.Sqrt(fromNode.enemies[i] - toNode.enemies[i]);
-//		}
+		/* method - euclidean distance */
+		for(int i = 0; i < fromNode.players.Length; i++)
+		{
+			distance += Math.Sqrt(fromNode.players[i] - toNode.players[i]);
+		}
+		for(int i = 0; i < fromNode.enemies.Length; i++)
+		{
+			distance += Math.Sqrt(fromNode.enemies[i] - toNode.enemies[i]);
+		}
 		
 		/* method - sum of enemy threat */
-		int totalthreat = 0;
-		int totalhealth = 0;
-		foreach(int enemy in fromNode.enemies) 
-		{
-			totalhealth += enemy;
-		}		
-		for (int i = 0; i < fromNode.enemies.Length; i++)
-		{
-			if (fromNode.enemies[i] > 0)
-			{
-				totalthreat += enemies_att[i] * (totalhealth - fromNode.enemies[i]);
-			}
-		}
-		distance = totalthreat;
-		
+//		int totalthreat = 0;
+//		int totalhealth = 0;
+//		foreach(int enemy in fromNode.enemies) 
+//		{
+//			totalhealth += enemy;
+//		}		
+//		for (int i = 0; i < fromNode.enemies.Length; i++)
+//		{
+//			if (fromNode.enemies[i] > 0)
+//			{
+//				totalthreat += enemies_att[i] * (totalhealth - fromNode.enemies[i]);
+//			}
+//		}
+//		distance = totalthreat;
+//		
 		return distance;
 	}
 	
-	static private bool isNodeSmaller(Node left, Node right)
+	static private bool isNodeEqualSmaller(Node left, Node right)
 	{
 		bool result = true;
 		for (int i = 0; i < right.players.Length; i++)
@@ -403,6 +494,9 @@ public static class Simulation
 		public List<int> players_target = new List<int>();
 		public int[] enemies;
 		public List<int> enemies_target = new List<int>();
+		
+		public List<Node> rrtChildren = new List<Node>();
+		public bool isOptimal = false;
 		
 		
 		public Node(int[] pplayers, int[] penemies) 
@@ -541,7 +635,7 @@ public static class Simulation
 		{
 			totalPlayerHP += hp;	
 		}
-		Console.WriteLine("Player team total HPs: "+totalPlayerHP);	
+		Console.WriteLine("Player team total Health: "+totalPlayerHP);	
 			
 		Console.Write("Players: "+String.Join("", 
 			new List<int>(players).ConvertAll(i => i.ToString()+",").ToArray()) + "   ");

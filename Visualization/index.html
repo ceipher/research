@@ -27,6 +27,8 @@
 
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script>
+//python -m SimpleHTTPServer 8000 &
+//localhost:8000
 var margin = {top: 20, right: 120, bottom: 20, left: 120},
     width = 960 - margin.right - margin.left,
     height = 800 - margin.top - margin.bottom;
@@ -127,6 +129,12 @@ function update(source) {
   // Enter any new links at the parent's previous position.
   link.enter().insert("path", "g")
       .attr("class", "link")
+	  .attr("style", function(d) {
+		if (d.target.optimal == 1) {
+			return "stroke:#00ADFF";
+		} else {
+			return "stroke;#ccc";
+		}})
       .attr("d", function(d) {
         var o = {x: source.x0, y: source.y0};
         return diagonal({source: o, target: o});
