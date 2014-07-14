@@ -26,11 +26,15 @@
 <body>
 
 <script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+<div id="display_area" style="padding:0 100px">
+</div>
 <script>
 //python -m SimpleHTTPServer 8000 &
 //localhost:8000
+
 var margin = {top: 20, right: 120, bottom: 20, left: 120},
-    width = 960 - margin.right - margin.left,
+    width = 1280 - margin.right - margin.left,
     height = 800 - margin.top - margin.bottom;
     
 var i = 0,
@@ -43,12 +47,11 @@ var tree = d3.layout.tree()
 var diagonal = d3.svg.diagonal()
     .projection(function(d) { return [d.y, d.x]; });
 
-var svg = d3.select("body").append("svg")
+var svg = d3.select("#display_area").append("svg")
     .attr("width", width + margin.right + margin.left)
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
 d3.json("/data.json", function(error, flare) {
   root = flare;
   root.x0 = height / 2;
@@ -130,10 +133,12 @@ function update(source) {
   link.enter().insert("path", "g")
       .attr("class", "link")
 	  .attr("style", function(d) {
-		if (d.target.optimal == 1) {
+		if (d.target.type == 0) {
+			return "stroke:#ccc";
+		} else if (d.target.type == 1) {
 			return "stroke:#00ADFF";
 		} else {
-			return "stroke;#ccc";
+			return "stroke:#6E40B3";
 		}})
       .attr("d", function(d) {
         var o = {x: source.x0, y: source.y0};

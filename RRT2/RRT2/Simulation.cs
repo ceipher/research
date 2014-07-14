@@ -284,7 +284,7 @@ public static class Simulation
 	
 	static private void markOptimal(Node best)
 	{
-		best.isOptimal = true;
+		best.nodeType = Node.NODE_TYPE.IN_OPTIMAL;
 		if (best.parent != null)
 		{
 			markOptimal(best.parent);
@@ -313,21 +313,47 @@ public static class Simulation
 		string output = "\r\n" + indent(level) + "{\r\n";
 		
 		level++;
-		output += indent(level) + "\"name\": \"" + node.players.Sum() + "-"+node.enemies.Sum() + "\"";
-		if (node.isOptimal) 
+		output += indent(level) + "\"name\": \"" + node.toString() + "\"";
+		switch (node.nodeType)
 		{
-			output += ",\r\n" + indent(level) + "\"optimal\": " + "1";
-		} else 
-		{
-			output += ",\r\n" + indent(level) + "\"optimal\": " + "0";
+			case Node.NODE_TYPE.IN_EXPLORED:
+					
+				output += ",\r\n" + indent(level) + "\"type\": " + "0";
+				break;
+			
+			case Node.NODE_TYPE.IN_RRT:
+				output += ",\r\n" + indent(level) + "\"type\": " + "1";
+				break;	
+			
+			case Node.NODE_TYPE.IN_OPTIMAL:
+				output += ",\r\n" + indent(level) + "\"type\": " + "2";
+				break;
+			
+			default:
+				output += ",\r\n" + indent(level) + "\"type\": " + "0";
+				break;
+			
 		}
-		if (node.rrtChildren.Count > 0) 
+		
+		// Children recursion
+		if (node.rrtChildren.Count > 0 || node.exploredChildren.Count > 0)
 		{
 			output += ",\r\n" + indent(level) + "\"children\": " + "[";
-			
-			foreach (Node child in node.rrtChildren)
+			if (node.rrtChildren.Count > 0) 
+			{			
+				foreach (Node child in node.rrtChildren)
+				{
+					output += "\t" + outputNode(child, level) + ",";
+				}	
+			}
+			if (node.exploredChildren.Count > 0)
 			{
-				output += "\t" + outputNode(child, level) + ",";
+				foreach (Node child in node.exploredChildren)
+				{
+					if (child.nodeType == Node.NODE_TYPE.IN_EXPLORED) {
+						output += "\t" + outputNode(child, level) + ",";
+					}
+				}
 			}
 			output = output.Substring(0, output.Length - 1);
 			output += "\r\n" + indent(level) + "]";
@@ -384,21 +410,46 @@ public static class Simulation
 	
 	static private void connect(Node candidate, List<Node> graph, Node root)
 	{
+		//Phase 1 - choose best node in graph
+		Node best = root;
+		double min = findDistance(root, candidate);
+		foreach (Node node in graph)
+		{	
+			if (isNodeEqualSmaller(candidate, node))
+			{
+				double distance = findDistance(node, candidate);
+				if (distance < min)
+				{
+					min = distance;
+					best = node;
+				}
+			}
+		}
 		
+		//Phase 2 - choose best node among selected node and its children
+		List<Node> currentPool = new List<Node>();
 		List<Node> validNodes = new List<Node>();
-		foreach (Node node in graph) 
+		currentPool.Add(best);
+		if (best.exploredChildren.Count == 0) // check if the node's children get explored
+		{
+			foreach(Node child in best.getChildren())
+			{
+				currentPool.Add(child);
+				best.exploredChildren.Add(child);
+			}
+		} else {
+			foreach(Node explored in best.exploredChildren)
+			{
+				currentPool.Add(explored);
+			}
+		}
+		
+		foreach (Node node in currentPool)
 		{
 			if (isNodeEqualSmaller(candidate, node))
 			{
 				validNodes.Add(node);
-			}			
-			foreach (Node child in node.getChildren())
-			{
-				if (isNodeEqualSmaller(candidate, child))
-				{
-					validNodes.Add(child);
-				}
-			}
+			}					
 		}
 				
 		Node closestNode = root;
@@ -413,6 +464,7 @@ public static class Simulation
 				closestNode = node;
 			}
 		}
+		closestNode.nodeType = Node.NODE_TYPE.IN_RRT;
 		addNode (graph,closestNode);
 	}
 	
@@ -445,7 +497,7 @@ public static class Simulation
 //			}
 //		}
 //		distance = totalthreat;
-//		
+		
 		return distance;
 	}
 	
@@ -496,8 +548,9 @@ public static class Simulation
 		public List<int> enemies_target = new List<int>();
 		
 		public List<Node> rrtChildren = new List<Node>();
-		public bool isOptimal = false;
-		
+		public List<Node> exploredChildren = new List<Node>();
+		public enum NODE_TYPE {IN_EXPLORED, IN_RRT, IN_OPTIMAL};
+		public NODE_TYPE nodeType = NODE_TYPE.IN_EXPLORED;
 		
 		public Node(int[] pplayers, int[] penemies) 
 		{
@@ -524,6 +577,7 @@ public static class Simulation
 					if (newNode.players[pi] > 0)
 					{						
 						int playerTarget = getPlayerStrategy(RANDOM_TARGET, newNode.enemies);
+						System.Threading.Thread.Sleep(1);
 						if (playerTarget < 0) continue;
 						newNode.enemies[playerTarget] -= players_att[pi];
 						if (newNode.enemies[playerTarget] < 0) newNode.enemies[playerTarget] = 0;
@@ -568,12 +622,12 @@ public static class Simulation
 			s+="p[";
 			foreach (int p in players)
 			{
-				s += p+",";
+				s += p+"-";
 			}
-			s+="],e[";
+			s+="]-e[";
 			foreach (int e in enemies)
 			{
-				s += e+",";
+				s += e+"-";
 			}
 			s+="]";
 			return s;
