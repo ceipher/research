@@ -22,11 +22,25 @@
   stroke-width: 1.5px;
 }
 
+.display_block {
+  width: 36px;
+  height: 16px;
+  float: left;
+  margin-right: 5px;
+}
 </style>
 <body>
 
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+<div id="note_area">
+	<div class="display_block" style="background: #ccc"></div>
+	<div>EXPLORED</div>
+	<div class="display_block" style="background: #00ADFF"></div>
+	<div>RRT</div>
+	<div class="display_block" style="background: #6E40B3"></div>
+	<div>RRT SOLUTION</div>
+</div>
 <div id="display_area" style="padding:0 100px">
 </div>
 <script>

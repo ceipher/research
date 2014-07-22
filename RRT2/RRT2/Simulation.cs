@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 
+using RRT2;
 
 public static class Simulation
 {
@@ -56,6 +57,7 @@ public static class Simulation
 	
 	static public void Main ()
 	{
+		RRTNode n = new RRTNode();
 		resetGame();
 		runRRT();
 		//runGreedyGame(1, LOWEST_HP_TARGET);
@@ -228,7 +230,7 @@ public static class Simulation
 	
 	static private void runRRT()
 	{
-		int K =5000;
+		int K =2000;
 		List<Node> graph = new List<Node>();
 		Node root = new Node(players, enemies);
 		graph.Add(root);
