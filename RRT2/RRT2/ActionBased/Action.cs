@@ -3,7 +3,7 @@ using System;
 namespace RRT2
 {
 	
-	public enum ACTION_TYPE {ATTACK, HEAL, NONE};
+	public enum ACTION_TYPE {ATTACK, POTION, NONE};
 	
 	public class Action
 	{

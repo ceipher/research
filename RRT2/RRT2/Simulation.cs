@@ -55,14 +55,13 @@ public static class Simulation
 	private static int turnCount = 0;	
 	private static List<int[]> strategyTree = new List<int[]>();
 	
-	static public void Main ()
-	{
-		RRTNode n = new RRTNode();
-		resetGame();
-		runRRT();
-		//runGreedyGame(1, LOWEST_HP_TARGET);
-		
-	}
+//	static public void Main ()
+//	{
+//		resetGame();
+//		runRRT();
+//		//runGreedyGame(1, LOWEST_HP_TARGET);
+//		
+//	}
 	
 
 	static public IEnumerable<IEnumerable<T>> IntCombinations<T>(this IEnumerable<T> elements, int k)

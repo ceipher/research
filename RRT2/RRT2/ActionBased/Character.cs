@@ -5,18 +5,20 @@ namespace RRT2
 	public class Character
 	{
 		public int health;
-		public int max_health;
+		public int maxHealth;
 		public int attack;
-		public Character (int pMaxHealth, int pAttack)
+		public int potionLeft;
+		public Character (int pMaxHealth, int pAttack, int pPotions)
 		{
-			this.max_health = pMaxHealth;
+			this.maxHealth = pMaxHealth;
 			this.health = pMaxHealth;
 			this.attack = pAttack;
+			this.potionLeft = pPotions;
 		}
 		
 		public Character Copy()
 		{
-			Character newC = new Character(this.max_health, this.attack);
+			Character newC = new Character(this.maxHealth, this.attack, this.potionLeft);
 			newC.health = this.health;
 			return newC;
 		}

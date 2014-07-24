@@ -16,18 +16,18 @@ namespace RRT2
 		public static List<Character> generateDefaultPlayers()
 		{
 			List<Character> players = new List<Character>();
-			players.Add (new Character(100,4));
-			players.Add (new Character(100,8));
-			players.Add (new Character(100,5));
+			players.Add (new Character(16,2,1));
+			players.Add (new Character(16,2,1));
+			players.Add (new Character(16,2,1));
 			return players;
 		}
 		
 		public static List<Character> generateDefaultEnemies()
 		{
 			List<Character> enemies = new List<Character>();
-			enemies.Add (new Character(14,4));
-			enemies.Add (new Character(15,8));
-			enemies.Add (new Character(30,9));
+			enemies.Add (new Character(10,2,0));
+			enemies.Add (new Character(10,2,0));
+			enemies.Add (new Character(10,2,0));
 			return enemies;
 		}
 	
@@ -160,6 +160,15 @@ namespace RRT2
 			}		
 		}
 		
+		public static int getHealthSum(List<Character> listOfCharacters)
+		{
+			int sum = 0;
+			foreach (Character c in listOfCharacters)
+			{
+				sum += c.health;
+			}
+			return sum;
+		}
 	}
 	
 }

@@ -43,22 +43,36 @@ namespace RRT2
 				newChild.parent = this;
 				for (int playerIndex = 0; playerIndex < newChild.players.Count; playerIndex++)
 				{
-					if (newChild.players[playerIndex].health > 0)
-					{						
-						Action playerAction = Utils.getPlayerStrategy(STRATEGY.RANDOM_TARGET, newChild.enemies);
-						System.Threading.Thread.Sleep(1);
-						if (playerAction.target < 0) 
-						{
-							newChild.players_action.Add(new Action(ACTION_TYPE.NONE, -1));
-							break;
+					Action playerAction;
+					Character player = newChild.players[playerIndex];
+					if (player.health > 0)
+					{			
+					
+						if (player.health <= (player.maxHealth - Global.POTION_HEAL) && player.potionLeft > 0 && (new Random()).Next (100)>50) {
+							// Use Potion
+							playerAction = new Action(ACTION_TYPE.POTION, playerIndex);
+							player.potionLeft--;
+							player.health += Global.POTION_HEAL;
+							if (player.health > player.maxHealth) player.health = player.maxHealth;
+						} else {
+							// Attack
+							playerAction = Utils.getPlayerStrategy(STRATEGY.RANDOM_TARGET, newChild.enemies);
+							
+							System.Threading.Thread.Sleep(1);
+							if (playerAction.type != ACTION_TYPE.NONE) 
+							{						
+								newChild.enemies[playerAction.target].health -= player.attack;
+								if (newChild.enemies[playerAction.target].health < 0) 
+								{
+									newChild.enemies[playerAction.target].health = 0;
+								}	
+							}
 						}
-						newChild.enemies[playerAction.target].health -= players[playerIndex].attack;
-						if (newChild.enemies[playerAction.target].health < 0) 
-						{
-							newChild.enemies[playerAction.target].health = 0;
-						}						
-						newChild.players_action.Add(playerAction);
-					}
+					} else {
+						playerAction = new Action(ACTION_TYPE.NONE, -1);
+					} 
+					
+					newChild.players_action.Add(playerAction);
 				}
 				for (int enemyIndex = 0; enemyIndex < newChild.enemies.Count; enemyIndex++)
 				{
@@ -98,6 +112,39 @@ namespace RRT2
 			}
 			return result;
 		}
+		
+		public bool isNodeEqualSmaller(RRTNode target)
+		{
+			bool result = true;
+			for (int i = 0; i < target.players.Count; i++)
+			{
+				if (this.players[i].health > target.players[i].health)
+				{
+					result = false;
+				}
+			}
+			for (int i = 0; i < target.enemies.Count; i++)
+			{
+				if (this.enemies[i].health > target.enemies[i].health)
+				{
+					result = false;
+				}
+			}
+			return result;
+		}
+		
+		public int getRounds()
+		{
+			RRTNode temp = this;
+			int count = 0;
+			while(temp.parent!=null)
+			{
+				count++;
+				temp=temp.parent;
+			}
+			return count;
+		}
+		
 		
 		public String toString() 
 		{
