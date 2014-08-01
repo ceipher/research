@@ -21,7 +21,10 @@ namespace RRT2
             }
 			if (state.players[playerIndex].health <= 0) 
 			{
-				DoPlayerAction(state.Copy (), playerIndex+1, childrenList);
+				GameState updatedState = state.Copy();
+				Action noAction = new Action(ACTION_TYPE.NONE, state.players[playerIndex], state.players[playerIndex]);
+				updatedState.playersAction.Add(noAction);
+				DoPlayerAction(updatedState, playerIndex+1, childrenList);
                 return;
             }
             for(int i = 0; i < state.enemies.Count; i++)
@@ -30,10 +33,11 @@ namespace RRT2
                 Character currentTarget = state.enemies[i];
                 Character currentPlayer = state.players[playerIndex];
                 Character updatedTarget = state.enemies[i].Copy ();
-                updatedTarget.health -= currentPlayer.attack;
-				if ( updatedTarget.health < 0)  updatedTarget.health = 0;
+				Action action = new Action(ACTION_TYPE.ATTACK, currentPlayer, updatedTarget);
+                currentPlayer.castAction(action);
                 GameState updatedState = state.Copy();
                 updatedState.enemies[i] = updatedTarget;
+				updatedState.playersAction.Add(action);
                 DoPlayerAction(updatedState, playerIndex+1, childrenList);
             }
         }
@@ -42,7 +46,7 @@ namespace RRT2
         
         public static Action getPlayerStrategy(Character actionDealer, STRATEGY strategy, List<Character> enemies) 
         {
-            Action action = new Action(ACTION_TYPE.NONE, actionDealer);
+            Action action = new Action(ACTION_TYPE.NONE, actionDealer, actionDealer);
             Character target = actionDealer;
             /* non-waste-damage mechanism */
             List<int> aliveEnemyPointers = new List<int>();
@@ -60,7 +64,7 @@ namespace RRT2
             {
                 case STRATEGY.RANDOM_TARGET:            
                     Random rand = new Random();
-                    action = new Action(ACTION_TYPE.ATTACK,
+                    action = new Action(ACTION_TYPE.ATTACK, actionDealer, 
 						enemies[aliveEnemyPointers[rand.Next(aliveEnemyPointers.Count)]]);
                     break;        
                         
@@ -74,7 +78,7 @@ namespace RRT2
                             minHP = enemies[pp].health;
                         }
                     }    
-                    action = new Action(ACTION_TYPE.ATTACK, target);
+                    action = new Action(ACTION_TYPE.ATTACK, actionDealer, target);
                     break;
                 
                 case STRATEGY.HIGHEST_ATTACK_TARGET:
@@ -87,7 +91,7 @@ namespace RRT2
                             maxAttack = enemies[pp].attack;
                         }
                     }
-                    action = new Action(ACTION_TYPE.ATTACK, target);
+                    action = new Action(ACTION_TYPE.ATTACK, actionDealer, target);
                     break;
                     
                 case STRATEGY.THREAT_TARGET:
@@ -101,7 +105,7 @@ namespace RRT2
                             maxThreatValue = threatValue;
                         }
                     }
-                    action = new Action(ACTION_TYPE.ATTACK, target);
+                    action = new Action(ACTION_TYPE.ATTACK, actionDealer, target);
                     break;
             }
                 
@@ -110,7 +114,7 @@ namespace RRT2
         
         public static Action getEnemyStrategy(Character actionDealer, STRATEGY strategy, List<Character> players) 
         {
-            Action action = new Action(ACTION_TYPE.NONE, actionDealer);
+            Action action = new Action(ACTION_TYPE.NONE, actionDealer, actionDealer);
             Character target = actionDealer;
             List<int> alivePlayerPointers = new List<int>();
             for(int j = 0; j < players.Count; j++) 
@@ -135,12 +139,13 @@ namespace RRT2
                             minHP = players[pp].health;
                         }
                     }                
-                    action = new Action(ACTION_TYPE.ATTACK, target);
+                    action = new Action(ACTION_TYPE.ATTACK, actionDealer, target);
                     break;
                 
                 case STRATEGY.RANDOM_TARGET:
                     Random rand = new Random();
-                    action = new Action(ACTION_TYPE.ATTACK, players[alivePlayerPointers[rand.Next(alivePlayerPointers.Count)]]);
+                    action = new Action(ACTION_TYPE.ATTACK, actionDealer, 
+						players[alivePlayerPointers[rand.Next(alivePlayerPointers.Count)]]);
                     break;                
             }
     

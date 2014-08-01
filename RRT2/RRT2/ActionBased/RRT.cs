@@ -29,10 +29,6 @@ namespace RRT2
 		}
 			
 		
-
-		
-		
-		
 		private static GameState sampleNode(Random rand) 
 		{
 			List<Character> randPlayers = new List<Character>();
@@ -40,13 +36,13 @@ namespace RRT2
 			
 			for (int i = 0; i < players.Count; i++)
 			{
-				Character randPlayer = new Character(players[i].maxHealth, players[i].attack);
+				Character randPlayer = new Character(players[i].maxHealth, players[i].attack, "P"+(i+1));
 				randPlayer.health = rand.Next (players[i].maxHealth);
 				randPlayers.Add(randPlayer);
 			}
 			for (int j = 0; j < enemies.Count; j++)
 			{
-				Character randEnemy = new Character(enemies[j].maxHealth, enemies[j].attack);
+				Character randEnemy = new Character(enemies[j].maxHealth, enemies[j].attack, "E"+(j+1));
 				randEnemy.health = rand.Next (enemies[j].maxHealth);
 				randEnemies.Add(randEnemy);
 			}

@@ -39,6 +39,8 @@ namespace RRT2
 		{
 			List<Character> copyPlayers = new List<Character>();	
 			List<Character> copyEnemies = new List<Character>();
+			List<Action> copyPlayerActions = new List<Action>();	
+			List<Action> copyEnemieActions = new List<Action>();
 			foreach(Character p in players)
 			{
 				copyPlayers.Add (p.Copy ());
@@ -47,9 +49,17 @@ namespace RRT2
 			{
 				copyEnemies.Add (e.Copy ());
 			}
+			foreach(Action a in playersAction)
+			{
+				copyPlayerActions.Add(a);
+			}
+			foreach(Action a in enemiesAction)
+			{
+				copyEnemieActions.Add(a);
+			}
 			GameState newState = new GameState(copyPlayers, copyEnemies, playersPotionLeft);
-			newState.playersAction = playersAction;
-			newState.enemiesAction = enemiesAction;
+			newState.playersAction = copyPlayerActions;
+			newState.enemiesAction = copyEnemieActions;
 			return newState;
 		}
 		
@@ -68,7 +78,7 @@ namespace RRT2
 						enemyAction = Utils.getEnemyStrategy(e, STRATEGY.LOWEST_HP_TARGET, s.players);
 						e.castAction(enemyAction);
 					} else {
-						enemyAction = new Action(ACTION_TYPE.NONE, e);
+						enemyAction = new Action(ACTION_TYPE.NONE, e, e);
 					}
 					s.enemiesAction.Add(enemyAction);
 				}
@@ -94,7 +104,7 @@ namespace RRT2
 					{		
 						if (newChild.playersPotionLeft > 0 && (new Random()).Next (100)>50) {
 							// Use Potion
-							playerAction = new Action(ACTION_TYPE.POTION, player);
+							playerAction = new Action(ACTION_TYPE.POTION, player, player);
 							newChild.playersPotionLeft--;
 							player.castAction(playerAction);
 						} else {
@@ -105,7 +115,7 @@ namespace RRT2
 							player.castAction(playerAction);
 						}
 					} else {
-						playerAction = new Action(ACTION_TYPE.NONE, player);
+						playerAction = new Action(ACTION_TYPE.NONE, player, player);
 					} 
 					newChild.playersAction.Add(playerAction);
 				}
@@ -118,7 +128,7 @@ namespace RRT2
 						enemies[enemyIndex].castAction(enemyAction);
 						
 					} else {
-						enemyAction = new Action(ACTION_TYPE.NONE, enemies[enemyIndex]);
+						enemyAction = new Action(ACTION_TYPE.NONE, enemies[enemyIndex],  enemies[enemyIndex]);
 					}
 					newChild.enemiesAction.Add(enemyAction);
 				}
@@ -202,5 +212,22 @@ namespace RRT2
 			return s;
 		}
 				
+		public String printActions()
+		{
+			String output = "";
+			for (int i=0; i<getRounds(); i++)
+			{
+				for (int j=0; j<players.Count; j++)
+				{
+					output += playersAction[j+(i*players.Count)].ToString()+"\n";
+				}
+				for (int j=0; j<enemies.Count; j++)
+				{
+					output += enemiesAction[j+(i*enemies.Count)].ToString()+"\n";
+				}
+				output += "Round End"+"\n";
+			}
+			return output;
+		}
 	}
 }
