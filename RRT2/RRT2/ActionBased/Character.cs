@@ -7,21 +7,40 @@ namespace RRT2
 		public int health;
 		public int maxHealth;
 		public int attack;
-		public int potionLeft;
-		public Character (int pMaxHealth, int pAttack, int pPotions)
+		public Character (int pMaxHealth, int pAttack)
 		{
 			this.maxHealth = pMaxHealth;
 			this.health = pMaxHealth;
 			this.attack = pAttack;
-			this.potionLeft = pPotions;
 		}
 		
 		public Character Copy()
 		{
-			Character newC = new Character(this.maxHealth, this.attack, this.potionLeft);
+			Character newC = new Character(this.maxHealth, this.attack);
 			newC.health = this.health;
 			return newC;
 		}
+		
+		public void castAction(Action action)
+		{
+			Character target = action.target;
+			switch(action.type)
+			{
+				case ACTION_TYPE.NONE:
+					break;
+				
+				case ACTION_TYPE.POTION:					
+					target.health += Global.POTION_HEAL;
+					if (target.health > target.maxHealth) target.health = target.maxHealth;
+					break;
+				
+				case ACTION_TYPE.ATTACK:
+					target.health -= this.attack;
+					if (target.health < 0) target.health = 0;
+					break;
+			}
+		}
+		
 	}
 	
 }

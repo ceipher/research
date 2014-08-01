@@ -8,12 +8,12 @@ namespace RRT2
 	public class Action
 	{
 		public ACTION_TYPE type;
-		public int target;
+		public Character target;
 		
-		public Action (ACTION_TYPE type, int target)
+		public Action (ACTION_TYPE actionType, Character actionTarget)
 		{
-			this.type = type;
-			this.target = target;
+			this.type = actionType;
+			this.target = actionTarget;
 		}
 	}
 	
