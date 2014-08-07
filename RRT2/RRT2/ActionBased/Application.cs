@@ -20,9 +20,9 @@ public static class Application
 		GameState startState = new GameState(players, enemies, 1);
 		
 
-		//List<GameState> graph = RRT.Build (startState);
-		List<GameState> graph = Greedy.Build (startState);
-		
+		List<GameState> graph = RRT.Build (startState);
+		//List<GameState> graph = Greedy.Build (startState);
+		//List<GameState> graph = BFSearch.Build (startState);
 		//Choose best path
 		double minValue = double.MaxValue;
 		GameState best = graph[0];
