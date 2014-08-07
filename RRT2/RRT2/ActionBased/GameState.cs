@@ -4,8 +4,10 @@ using System.Linq;
 
 namespace RRT2
 {
+	public enum GAME_STATE {PLAYER_WIN, ENEMY_WIN, INPROCESS};
 	public class GameState
 	{
+		public enum NODE_TYPE {IN_EXPLORED, IN_RRT, IN_OPTIMAL};
 		
 		public GameState parent;		
 		public List<Character> players;
@@ -16,7 +18,6 @@ namespace RRT2
 		
 		public List<GameState> rrtChildren = new List<GameState>();
 		public List<GameState> exploredChildren = new List<GameState>();
-		public enum NODE_TYPE {IN_EXPLORED, IN_RRT, IN_OPTIMAL};
 		public NODE_TYPE nodeType = NODE_TYPE.IN_EXPLORED;
 		
 		public GameState(List<Character> pplayers, List<Character> penemies, int playersPotions) 
@@ -73,13 +74,8 @@ namespace RRT2
 				foreach(Character e in s.enemies)
 				{
 					Action enemyAction;
-					if (e.health > 0)
-					{
-						enemyAction = Utils.getEnemyStrategy(e, STRATEGY.LOWEST_HP_TARGET, s.players);
-						e.castAction(enemyAction);
-					} else {
-						enemyAction = new Action(ACTION_TYPE.NONE, e, e);
-					}
+					enemyAction = Utils.getEnemyStrategy(e, STRATEGY.LOWEST_HP_TARGET, s.players);
+					e.castAction(enemyAction);
 					s.enemiesAction.Add(enemyAction);
 				}
 				s.parent = this;
@@ -100,36 +96,25 @@ namespace RRT2
 				{
 					Action playerAction;
 					Character player = newChild.players[playerIndex];
-					if (player.health > 0)
-					{		
-						if (newChild.playersPotionLeft > 0 && (new Random()).Next (100)>50) {
-							// Use Potion
-							playerAction = new Action(ACTION_TYPE.POTION, player, player);
-							newChild.playersPotionLeft--;
-							player.castAction(playerAction);
-						} else {
-							// Attack or DoNothing
-							playerAction = Utils.getPlayerStrategy(player, STRATEGY.RANDOM_TARGET, newChild.enemies);
-							
-							System.Threading.Thread.Sleep(1);
-							player.castAction(playerAction);
-						}
+					if (newChild.playersPotionLeft > 0 && (new Random()).Next (100)>50) {
+						// Use Potion
+						playerAction = new Action(ACTION_TYPE.POTION, player, player);
+						newChild.playersPotionLeft--;
+						player.castAction(playerAction);
 					} else {
-						playerAction = new Action(ACTION_TYPE.NONE, player, player);
-					} 
+						// Attack or DoNothing
+						playerAction = Utils.getPlayerStrategy(player, STRATEGY.RANDOM_TARGET, newChild.enemies);
+						
+						System.Threading.Thread.Sleep(1);
+						player.castAction(playerAction);
+					}
 					newChild.playersAction.Add(playerAction);
 				}
 				for (int enemyIndex = 0; enemyIndex < newChild.enemies.Count; enemyIndex++)
 				{
 					Action enemyAction;
-					if (newChild.enemies[enemyIndex].health >0)
-					{
-						enemyAction = Utils.getEnemyStrategy(newChild.enemies[enemyIndex], STRATEGY.LOWEST_HP_TARGET, newChild.players);
-						enemies[enemyIndex].castAction(enemyAction);
-						
-					} else {
-						enemyAction = new Action(ACTION_TYPE.NONE, enemies[enemyIndex],  enemies[enemyIndex]);
-					}
+					enemyAction = Utils.getEnemyStrategy(newChild.enemies[enemyIndex], STRATEGY.LOWEST_HP_TARGET, newChild.players);
+					enemies[enemyIndex].castAction(enemyAction);
 					newChild.enemiesAction.Add(enemyAction);
 				}
 				Utils.addNode(children, newChild);
@@ -228,6 +213,20 @@ namespace RRT2
 				output += "Round End"+"\n";
 			}
 			return output;
+		}
+		
+		
+		public GAME_STATE getGameState()
+		{
+			if (Utils.getHealthSum(players) > 0 && Utils.getHealthSum(enemies) == 0)
+			{
+				return GAME_STATE.PLAYER_WIN;
+			} else if (Utils.getHealthSum(players) == 0 && Utils.getHealthSum(enemies) > 0)
+			{
+				return GAME_STATE.ENEMY_WIN;
+			} else {
+				return GAME_STATE.INPROCESS;
+			}
 		}
 	}
 }

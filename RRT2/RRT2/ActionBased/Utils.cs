@@ -46,6 +46,8 @@ namespace RRT2
         
         public static Action getPlayerStrategy(Character actionDealer, STRATEGY strategy, List<Character> enemies) 
         {
+			if (actionDealer.health <= 0) return new Action(ACTION_TYPE.NONE, actionDealer, actionDealer);
+			
             Action action = new Action(ACTION_TYPE.NONE, actionDealer, actionDealer);
             Character target = actionDealer;
             /* non-waste-damage mechanism */
@@ -114,6 +116,8 @@ namespace RRT2
         
         public static Action getEnemyStrategy(Character actionDealer, STRATEGY strategy, List<Character> players) 
         {
+			if (actionDealer.health <= 0) return new Action(ACTION_TYPE.NONE, actionDealer, actionDealer);
+			
             Action action = new Action(ACTION_TYPE.NONE, actionDealer, actionDealer);
             Character target = actionDealer;
             List<int> alivePlayerPointers = new List<int>();
@@ -277,6 +281,7 @@ namespace RRT2
                 Console.WriteLine("Number of rounds: " + count);
             }
         }
+		
     }
     
 }

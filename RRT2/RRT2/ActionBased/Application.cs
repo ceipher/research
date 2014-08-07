@@ -6,8 +6,6 @@ using RRT2;
 
 public static class Application
 {
-	static public void Main2 (){
-	}
 	static public void Main ()
 	{		
 		List<Character> players = new List<Character>();
@@ -22,7 +20,8 @@ public static class Application
 		GameState startState = new GameState(players, enemies, 1);
 		
 
-		List<GameState> graph = RRT.Build (startState);
+		//List<GameState> graph = RRT.Build (startState);
+		List<GameState> graph = Greedy.Build (startState);
 		
 		//Choose best path
 		double minValue = double.MaxValue;
@@ -69,7 +68,6 @@ public static class Application
 		Console.WriteLine("Player team total Health: " + Utils.getHealthSum(best.players));
 		Console.WriteLine("BEST: " + best.ToString());
 		Utils.outputGraph(graph, graph[0]);
-		
 	}
-			
+	
 }
