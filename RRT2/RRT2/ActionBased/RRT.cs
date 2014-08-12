@@ -10,7 +10,7 @@ namespace RRT2
 	{
 		public static List<Character> players;
 		public static List<Character> enemies;
-		public static int K = Global.RRT_ITERATION;
+		public static int K = Global.MAX_ITERATION;
 		
 		public static List<GameState> Build(GameState rootState)
 		{

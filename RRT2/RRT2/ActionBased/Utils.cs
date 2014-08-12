@@ -182,6 +182,16 @@ namespace RRT2
             }
             return sum;
         }
+		
+		public static int getMaxHealthSum(List<Character> listOfCharacters)
+        {
+            int sum = 0;
+            foreach (Character c in listOfCharacters)
+            {
+                sum += c.maxHealth;
+            }
+            return sum;
+        }
         
         public static void outputGraph(List<GameState> graph, GameState root) 
         {

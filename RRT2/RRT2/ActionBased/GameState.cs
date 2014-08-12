@@ -16,9 +16,12 @@ namespace RRT2
 		public List<Character> enemies;
 		public List<Action> enemiesAction = new List<Action>();
 		
-		public List<GameState> rrtChildren = new List<GameState>();
-		public List<GameState> exploredChildren = new List<GameState>();
-		public NODE_TYPE nodeType = NODE_TYPE.IN_EXPLORED;
+		public int N = 0;//MonteCarlo
+		public float Q = 0;//MonteCarlo
+		public bool isExpanded = false;//MonteCarlo
+		public List<GameState> exploredChildren = new List<GameState>();//MonteCarlo & RRT
+		public NODE_TYPE nodeType = NODE_TYPE.IN_EXPLORED;//RRT
+		public List<GameState> rrtChildren = new List<GameState>();//RRT Display
 		
 		public GameState(List<Character> pplayers, List<Character> penemies, int playersPotions) 
 		{
@@ -67,6 +70,8 @@ namespace RRT2
 		public List<GameState> GetAllChildren()
 		{
 			List<GameState> allChildren = new List<GameState>();
+			if (this.getGameState() != GAME_STATE.INPROCESS) return allChildren;
+			
 			List<GameState> playerTurnChildren = new List<GameState>();
 			Utils.DoPlayerAction(this,0,playerTurnChildren);// Player turn
 			foreach(GameState s in playerTurnChildren)// Enmey turn
