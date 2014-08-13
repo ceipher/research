@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
 
-namespace RRT2
+namespace AG
 {
 	public class Greedy
-	{		
+	{		 
 		public static List<GameState> Build(GameState rootState)
 		{
 			List<GameState> graph = new List<GameState>();

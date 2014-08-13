@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
-namespace RRT2
+namespace AG
 {
 	public enum GAME_STATE {PLAYER_WIN, ENEMY_WIN, INPROCESS};
 	public class GameState

@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
-using RRT2;
+using AG;
 
-namespace RRT2
+namespace AG
 {
     
     public enum STRATEGY {RANDOM_TARGET, LOWEST_HP_TARGET, HIGHEST_ATTACK_TARGET, THREAT_TARGET}
@@ -202,8 +201,8 @@ namespace RRT2
                     n.parent.rrtChildren.Add(n);
                 }
             }
-            string lines = outputGameState(root, 0);
-            FileStream fcreate = File.Open("C:\\Users\\lenovo\\Desktop\\Research\\Project\\research\\Visualization\\data.json", FileMode.Create);
+			string lines = outputGameState(root, 0);
+			FileStream fcreate = File.Open("D:\\CSharpProject\\AG\\AG\\Visualization\\data.json", FileMode.Create);
             StreamWriter file = new StreamWriter(fcreate);
             file.WriteLine(lines);
             file.Close();

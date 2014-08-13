@@ -1,6 +1,6 @@
 using System;
 
-namespace RRT2
+namespace AG
 {
 	
 	public enum ACTION_TYPE {ATTACK, POTION, NONE};

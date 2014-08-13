@@ -1,6 +1,6 @@
 using System;
 
-namespace RRT2
+namespace AG
 {
 	public class Global
 	{
