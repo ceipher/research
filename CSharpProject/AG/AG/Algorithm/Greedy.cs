@@ -17,14 +17,14 @@ namespace AG
 				GameState newState = current.Copy();
 				foreach(Character p in newState.players)
 				{
-					Action pAction = Utils.getPlayerStrategy(p, STRATEGY.THREAT_TARGET, newState.enemies);
-					p.castAction(pAction);
+					Action pAction = Utils.getPlayerStrategy(p, STRATEGY.RANDOM_ACTION, newState);
+					newState.doAction(pAction);
 					newState.playersAction.Add(pAction);
 				}
 				foreach(Character e in newState.enemies)
 				{
-					Action eAction = Utils.getEnemyStrategy(e, STRATEGY.LOWEST_HP_TARGET, newState.players);
-					e.castAction(eAction);
+					Action eAction = Utils.getEnemyStrategy(e, STRATEGY.LOWEST_HP_TARGET, newState);
+					newState.doAction(eAction);
 					newState.enemiesAction.Add(eAction);
 				}
 				newState.parent = current;

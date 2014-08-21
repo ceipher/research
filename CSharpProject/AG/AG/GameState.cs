@@ -27,17 +27,142 @@ namespace AG
 			players = new List<Character>();
 			foreach(Character player in pplayers)
 			{
-				players.Add(player.Copy());
+				Character pc = player.Copy ();
+				players.Add(pc);
 			}
 			playersPotionLeft = playersPotions;
 			
 			enemies = new List<Character>();
 			foreach(Character enemy in penemies)
 			{
-				enemies.Add(enemy.Copy());
+				Character ec = enemy.Copy();
+				enemies.Add(ec);
 			}
 		}
+
+		public List<GameState> GetAllChildren()
+		{
+			List<GameState> allChildren = new List<GameState>();
+			if (this.getGameState() != GAME_STATE.INPROCESS) return allChildren;
+			
+			List<GameState> playerTurnChildren = new List<GameState>();
+			Utils.DoPlayerAction(this,0,playerTurnChildren);// Player turn
+			foreach(GameState s in playerTurnChildren)// Enmey turn
+			{
+				foreach(Character e in s.enemies)
+				{
+					Action enemyAction;
+					enemyAction = Utils.getEnemyStrategy(e, STRATEGY.LOWEST_HP_TARGET, s);
+					s.doAction(enemyAction);
+					s.enemiesAction.Add(enemyAction);
+				}
+				s.parent = this;
+				allChildren.Add(s);
+			}
+			return allChildren;
+		}
+
+		public List<Action> getAvailableActions (Character c)
+		{
+			List<Action> actions = new List<Action> ();
+			if (!c.isNormal()) { 
+				return actions;
+			}
+			foreach (Character e in this.enemies) {
+				if (e.health > 0) {
+					actions.Add(new Action(ACTION_TYPE.ATTACK, c, e));
+
+					if (c.magics.Count > 0)
+					{
+						foreach(Magic magic in c.magics)
+						{
+							if (magic.manaCost <= c.mana){
+								actions.Add(new Action(ACTION_TYPE.MAGIC, magic, c, e));
+							}
+						}						
+					}
+				}
+			}
+			if (this.playersPotionLeft > 0) {
+				actions.Add(new Action(ACTION_TYPE.POTION, c, c));
+			}
+			return actions;
+		}
+
 		
+		public void doAction(Action action)
+		{
+			Character target = action.target;
+			Character source = action.source;
+			switch(action.type)
+			{
+			case ACTION_TYPE.NONE:
+				break;
+				
+			case ACTION_TYPE.POTION:					
+				target.health += Global.POTION_HEAL;
+				if (target.health > target.maxHealth) target.health = target.maxHealth;
+				this.playersPotionLeft--;
+				break;
+				
+			case ACTION_TYPE.ATTACK:
+				target.health -= source.attack;
+				if (target.health < 0) target.health = 0;
+				break;
+			
+			case ACTION_TYPE.MAGIC:
+				target.health -= action.magic.damage;
+				target.debuff =action.magic.debuff;
+				target.debuffLeft = action.magic.effectiveRounds;
+				source.mana -= action.magic.manaCost;
+				if (source.mana < 0) source.mana = 0;
+				break;
+			}
+
+
+		}
+
+		/****
+		public List<GameState> GetSampleChildren()
+		{
+			Random rand = new Random();
+			List<GameState> children = new List<GameState>();
+			for (int i = 0; i < Global.CHILDREN_SAMPLING; i++) 
+			{
+				GameState newChild = new GameState(players, enemies, playersPotionLeft);
+				newChild.parent = this;
+				for (int playerIndex = 0; playerIndex < newChild.players.Count; playerIndex++)
+				{
+					Action playerAction;
+					Character player = newChild.players[playerIndex];
+					if (newChild.playersPotionLeft > 0 && (new Random()).Next (100)>50) {
+						// Use Potion
+						playerAction = new Action(ACTION_TYPE.POTION, player, player);
+						newChild.playersPotionLeft--;
+						player.doAction(playerAction);
+					} else {
+						// Attack or DoNothing
+						playerAction = Utils.getPlayerStrategy(player, STRATEGY.RANDOM_ACTION, newChild);
+						
+						System.Threading.Thread.Sleep(1);
+						player.doAction(playerAction);
+					}
+					newChild.playersAction.Add(playerAction);
+				}
+				for (int enemyIndex = 0; enemyIndex < newChild.enemies.Count; enemyIndex++)
+				{
+					Action enemyAction;
+					enemyAction = Utils.getEnemyStrategy(newChild.enemies[enemyIndex], STRATEGY.LOWEST_HP_TARGET, newChild.players);
+					enemies[enemyIndex].doAction(enemyAction);
+					newChild.enemiesAction.Add(enemyAction);
+				}
+				Utils.addNode(children, newChild);
+				
+			}
+			
+			return children;
+		}
+		**/
 		public GameState Copy() 
 		{
 			List<Character> copyPlayers = new List<Character>();	
@@ -65,69 +190,7 @@ namespace AG
 			newState.enemiesAction = copyEnemieActions;
 			return newState;
 		}
-		
-		public List<GameState> GetAllChildren()
-		{
-			List<GameState> allChildren = new List<GameState>();
-			if (this.getGameState() != GAME_STATE.INPROCESS) return allChildren;
-			
-			List<GameState> playerTurnChildren = new List<GameState>();
-			Utils.DoPlayerAction(this,0,playerTurnChildren);// Player turn
-			foreach(GameState s in playerTurnChildren)// Enmey turn
-			{
-				foreach(Character e in s.enemies)
-				{
-					Action enemyAction;
-					enemyAction = Utils.getEnemyStrategy(e, STRATEGY.LOWEST_HP_TARGET, s.players);
-					e.castAction(enemyAction);
-					s.enemiesAction.Add(enemyAction);
-				}
-				s.parent = this;
-				allChildren.Add(s);
-			}
-			return allChildren;
-		}
-		
-		public List<GameState> GetSampleChildren()
-		{
-			Random rand = new Random();
-			List<GameState> children = new List<GameState>();
-			for (int i = 0; i < Global.CHILDREN_SAMPLING; i++) 
-			{
-				GameState newChild = new GameState(players, enemies, playersPotionLeft);
-				newChild.parent = this;
-				for (int playerIndex = 0; playerIndex < newChild.players.Count; playerIndex++)
-				{
-					Action playerAction;
-					Character player = newChild.players[playerIndex];
-					if (newChild.playersPotionLeft > 0 && (new Random()).Next (100)>50) {
-						// Use Potion
-						playerAction = new Action(ACTION_TYPE.POTION, player, player);
-						newChild.playersPotionLeft--;
-						player.castAction(playerAction);
-					} else {
-						// Attack or DoNothing
-						playerAction = Utils.getPlayerStrategy(player, STRATEGY.RANDOM_TARGET, newChild.enemies);
-						
-						System.Threading.Thread.Sleep(1);
-						player.castAction(playerAction);
-					}
-					newChild.playersAction.Add(playerAction);
-				}
-				for (int enemyIndex = 0; enemyIndex < newChild.enemies.Count; enemyIndex++)
-				{
-					Action enemyAction;
-					enemyAction = Utils.getEnemyStrategy(newChild.enemies[enemyIndex], STRATEGY.LOWEST_HP_TARGET, newChild.players);
-					enemies[enemyIndex].castAction(enemyAction);
-					newChild.enemiesAction.Add(enemyAction);
-				}
-				Utils.addNode(children, newChild);
-				
-			}
-			
-			return children;
-		}
-		
+
 		public bool isEqual(GameState other)
 		{
 			bool result = true;
@@ -194,7 +257,12 @@ namespace AG
 			s+="]-e[";
 			foreach (Character e in enemies)
 			{
-				s += e.health+"-";
+				s += e.health;
+				if (e.debuff != DEBUFF.NONE)
+				{
+					s+= "(" + e.debuff.ToString()+ ")";
+				}
+				s+= "-";
 			}
 			s+="]";
 			s+="-potions["+playersPotionLeft+"]";

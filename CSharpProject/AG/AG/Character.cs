@@ -1,5 +1,5 @@
 using System;
-
+using System.Collections.Generic;
 namespace AG
 {
 	public class Character
@@ -7,7 +7,13 @@ namespace AG
 		public string name;
 		public int health;
 		public int maxHealth;
+		public int mana = 50;
+		public int maxMana = 50;
 		public int attack;
+		public DEBUFF debuff = DEBUFF.NONE;
+		public int debuffLeft = 0;
+		public List<Magic> magics = new List<Magic>();
+
 		public Character (int pMaxHealth, int pAttack, string pName)
 		{
 			this.maxHealth = pMaxHealth;
@@ -15,34 +21,30 @@ namespace AG
 			this.attack = pAttack;
 			this.name = pName;
 		}
-		
+
+		public Character (int pMaxHealth, int pAttack, string pName, List<Magic> pMagics)
+		{
+			this.maxHealth = pMaxHealth;
+			this.health = pMaxHealth;
+			this.attack = pAttack;
+			this.name = pName;
+			magics.AddRange (pMagics);
+		}
+
 		public Character Copy()
 		{
-			Character newC = new Character(maxHealth, attack, name);
+			Character newC = new Character(maxHealth, attack, name, magics);
 			newC.health = this.health;
+			newC.mana = this.mana;
+			newC.debuff = debuff;
+			newC.debuffLeft = debuffLeft;
 			return newC;
 		}
-		
-		public void castAction(Action action)
+
+		public bool isNormal()
 		{
-			Character target = action.target;
-			switch(action.type)
-			{
-				case ACTION_TYPE.NONE:
-					break;
-				
-				case ACTION_TYPE.POTION:					
-					target.health += Global.POTION_HEAL;
-					if (target.health > target.maxHealth) target.health = target.maxHealth;
-					break;
-				
-				case ACTION_TYPE.ATTACK:
-					target.health -= this.attack;
-					if (target.health < 0) target.health = 0;
-					break;
-			}
+			return debuff != DEBUFF.SLEEPING && health > 0;
 		}
-		
 	}
 	
 }

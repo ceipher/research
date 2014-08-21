@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 namespace AG
 {
 	public class MonteCarlo
@@ -28,11 +27,11 @@ namespace AG
 			while(ve.getGameState() == GAME_STATE.INPROCESS)
 			{
 				ve = BestChild(ve,0);
-				graph.Add(ve);
 				if (ve == null)
 				{
 					break;
 				}
+				graph.Add(ve);
 			}
 			return graph;
 		}
@@ -110,13 +109,13 @@ namespace AG
 				GameState newState = current.Copy();
 				foreach(Character p in newState.players)
 				{
-					Action pAction = Utils.getPlayerStrategy(p, STRATEGY.RANDOM_TARGET, newState.enemies);
-					p.castAction(pAction);
+					Action pAction = Utils.getPlayerStrategy(p, STRATEGY.RANDOM_ACTION, newState);
+					newState.doAction(pAction);
 				}
 				foreach(Character e in newState.enemies)
 				{
-					Action eAction = Utils.getEnemyStrategy(e, STRATEGY.LOWEST_HP_TARGET, newState.players);
-					e.castAction(eAction);
+					Action eAction = Utils.getEnemyStrategy(e, STRATEGY.LOWEST_HP_TARGET, newState);
+					newState.doAction(eAction);
 				}
 				current = newState;
 			}

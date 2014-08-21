@@ -35,13 +35,17 @@
   <ItemGroup>
     <Compile Include="Action.cs" />
     <Compile Include="Application.cs" />
-    <Compile Include="BFSearch.cs" />
     <Compile Include="Character.cs" />
     <Compile Include="GameState.cs" />
     <Compile Include="Global.cs" />
-    <Compile Include="Greedy.cs" />
-    <Compile Include="MonteCarlo.cs" />
-    <Compile Include="RRT.cs" />
     <Compile Include="Utils.cs" />
+    <Compile Include="Algorithm\BFSearch.cs" />
+    <Compile Include="Algorithm\MonteCarlo.cs" />
+    <Compile Include="Algorithm\Greedy.cs" />
+    <Compile Include="Algorithm\RRT.cs" />
+    <Compile Include="GameControl.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Algorithm\" />
   </ItemGroup>
 </Project>

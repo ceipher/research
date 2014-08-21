@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using AG;
 
 public static class Application
@@ -9,7 +8,7 @@ public static class Application
 	static public void Main ()
 	{		
 		List<Character> players = new List<Character>();
-		players.Add (new Character(10,2,"P1"));
+		players.Add (new Character(10,2,"P1", new List<Magic> (new Magic[] {Magic.Sleep})));
 		players.Add (new Character(8,5,"P2"));
 		players.Add (new Character(7,1,"P3"));
 		List<Character> enemies = new List<Character>();
@@ -19,10 +18,10 @@ public static class Application
 		
 		GameState startState = new GameState(players, enemies, 1);
 		
-		List<GameState> graph = MonteCarlo.Build (startState);
 		//List<GameState> graph = RRT.Build (startState);
 		//List<GameState> graph = Greedy.Build (startState);
-		//List<GameState> graph = BFSearch.Build (startState);
+		List<GameState> graph = BFSearch.Build (startState);
+		//List<GameState> graph = MonteCarlo.Build (startState);
 		
 		
 		//Choose best path

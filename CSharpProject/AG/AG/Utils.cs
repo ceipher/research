@@ -6,7 +6,7 @@ using AG;
 namespace AG
 {
     
-    public enum STRATEGY {RANDOM_TARGET, LOWEST_HP_TARGET, HIGHEST_ATTACK_TARGET, THREAT_TARGET}
+    public enum STRATEGY {RANDOM_ACTION, LOWEST_HP_TARGET, HIGHEST_ATTACK_TARGET, THREAT_TARGET}
     
     public class Utils
     {
@@ -18,42 +18,66 @@ namespace AG
                 childrenList.Add(state);
                 return;
             }
-			if (state.players[playerIndex].health <= 0) 
+
+			Character currentPlayer = state.players[playerIndex];
+			if (currentPlayer.health <= 0) 
 			{
-				GameState updatedState = state.Copy();
-				Action noAction = new Action(ACTION_TYPE.NONE, state.players[playerIndex], state.players[playerIndex]);
-				updatedState.playersAction.Add(noAction);
-				DoPlayerAction(updatedState, playerIndex+1, childrenList);
+				GameState nextState = state.Copy();if (playerIndex == 0) GameControl.RoundBegin(nextState);
+
+				Action noAction =  Action.NoAction(nextState.players[playerIndex]);
+				nextState.doAction(noAction);
+				nextState.playersAction.Add(noAction);
+				DoPlayerAction(nextState, playerIndex+1, childrenList);
                 return;
             }
             for(int i = 0; i < state.enemies.Count; i++)
             {
 				if ( state.enemies[i].health <= 0 ) continue;
-                Character currentTarget = state.enemies[i];
-                Character currentPlayer = state.players[playerIndex];
-                Character updatedTarget = state.enemies[i].Copy ();
-				Action action = new Action(ACTION_TYPE.ATTACK, currentPlayer, updatedTarget);
-                currentPlayer.castAction(action);
-                GameState updatedState = state.Copy();
-                updatedState.enemies[i] = updatedTarget;
-				updatedState.playersAction.Add(action);
-                DoPlayerAction(updatedState, playerIndex+1, childrenList);
+				GameState nextState = state.Copy(); if (playerIndex == 0) GameControl.RoundBegin(nextState);
+
+				Character source = nextState.players[playerIndex];
+				Character target = nextState.enemies[i];     
+				Action action = new Action(ACTION_TYPE.ATTACK, source, target);
+                nextState.doAction(action);
+				nextState.playersAction.Add(action);
+                DoPlayerAction(nextState, playerIndex+1, childrenList);
+
+				foreach(Magic magic in currentPlayer.magics) {
+					if (magic.manaCost > currentPlayer.mana) continue;
+					nextState = state.Copy (); if (playerIndex == 0) GameControl.RoundBegin(nextState);
+					source = nextState.players[playerIndex];
+					target = nextState.enemies[i]; 
+					action = new Action(ACTION_TYPE.MAGIC, magic, source, target);
+					nextState.doAction(action);
+					nextState.playersAction.Add(action);
+					DoPlayerAction(nextState, playerIndex+1, childrenList);
+				}
             }
+			if (state.playersPotionLeft > 0) {
+				GameState nextState = state.Copy(); if (playerIndex == 0) GameControl.RoundBegin(nextState);
+				Character source = nextState.players[playerIndex];
+				Character target = nextState.players[playerIndex];
+				Action action = new Action(ACTION_TYPE.POTION, source, target);
+				nextState.doAction(action);
+				nextState.playersAction.Add(action);
+				DoPlayerAction(nextState, playerIndex+1, childrenList);
+			}
+
+
         }
-		       
-			
-        
-        public static Action getPlayerStrategy(Character actionDealer, STRATEGY strategy, List<Character> enemies) 
+
+		public static Action getPlayerStrategy(Character actionDealer, STRATEGY strategy, GameState currentState) 
         {
-			if (actionDealer.health <= 0) return new Action(ACTION_TYPE.NONE, actionDealer, actionDealer);
 			
-            Action action = new Action(ACTION_TYPE.NONE, actionDealer, actionDealer);
-            Character target = actionDealer;
+			Action action = Action.NoAction (actionDealer);
+			if (actionDealer.health <= 0) return action;
+
+			Character target = null;
             /* non-waste-damage mechanism */
             List<int> aliveEnemyPointers = new List<int>();
-            for(int j = 0; j < enemies.Count; j++) 
+            for(int j = 0; j < currentState.enemies.Count; j++) 
             {
-                if (enemies[j].health > 0) 
+                if (currentState.enemies[j].health > 0) 
                 {
                     aliveEnemyPointers.Add(j);
                 }
@@ -63,20 +87,20 @@ namespace AG
             /** Strategy implementation **/
             switch(strategy)
             {
-                case STRATEGY.RANDOM_TARGET:            
+                case STRATEGY.RANDOM_ACTION:            
                     Random rand = new Random();
-                    action = new Action(ACTION_TYPE.ATTACK, actionDealer, 
-						enemies[aliveEnemyPointers[rand.Next(aliveEnemyPointers.Count)]]);
+					List<Action> actionsAvailable = currentState.getAvailableActions(actionDealer);
+					action = actionsAvailable[rand.Next(actionsAvailable.Count)];
                     break;        
                         
                 case STRATEGY.LOWEST_HP_TARGET:
                     int minHP = int.MaxValue;
                     foreach (int pp in aliveEnemyPointers)
                     {
-                        if (enemies[pp].health < minHP)
+                        if (currentState.enemies[pp].health < minHP)
                         {
-                            target = enemies[pp];
-                            minHP = enemies[pp].health;
+                            target = currentState.enemies[pp];
+                            minHP = currentState.enemies[pp].health;
                         }
                     }    
                     action = new Action(ACTION_TYPE.ATTACK, actionDealer, target);
@@ -86,10 +110,10 @@ namespace AG
                     int maxAttack = int.MinValue;
                     foreach (int pp in aliveEnemyPointers) 
                     {
-                        if (enemies[pp].attack > maxAttack)
+                        if (currentState.enemies[pp].attack > maxAttack)
                         {
-                            target = enemies[pp];
-                            maxAttack = enemies[pp].attack;
+                            target = currentState.enemies[pp];
+                            maxAttack = currentState.enemies[pp].attack;
                         }
                     }
                     action = new Action(ACTION_TYPE.ATTACK, actionDealer, target);
@@ -99,10 +123,10 @@ namespace AG
                     int maxThreatValue = int.MinValue;
                     foreach (int pp in aliveEnemyPointers)
                     {
-                        int threatValue = enemies[pp].attack * (getHealthSum(enemies) - enemies[pp].health);
+                        int threatValue = currentState.enemies[pp].attack * (getHealthSum(currentState.enemies) - currentState.enemies[pp].health);
                         if (threatValue > maxThreatValue)
                         {
-                            target = enemies[pp];
+                            target = currentState.enemies[pp];
                             maxThreatValue = threatValue;
                         }
                     }
@@ -113,16 +137,18 @@ namespace AG
             return action;
         }
         
-        public static Action getEnemyStrategy(Character actionDealer, STRATEGY strategy, List<Character> players) 
+        public static Action getEnemyStrategy(Character actionDealer, STRATEGY strategy, GameState currentState) 
         {
-			if (actionDealer.health <= 0) return new Action(ACTION_TYPE.NONE, actionDealer, actionDealer);
 			
-            Action action = new Action(ACTION_TYPE.NONE, actionDealer, actionDealer);
-            Character target = actionDealer;
+            Action action = Action.NoAction(actionDealer);
+			if (!actionDealer.isNormal ()) {
+				return action;
+			}
+            Character target = null;
             List<int> alivePlayerPointers = new List<int>();
-            for(int j = 0; j < players.Count; j++) 
+            for(int j = 0; j < currentState.players.Count; j++) 
             {
-                if (players[j].health > 0)
+                if (currentState.players[j].health > 0)
                 {
                     alivePlayerPointers.Add(j);
                 }
@@ -136,19 +162,19 @@ namespace AG
                     int minHP = int.MaxValue;
                     foreach (int pp in alivePlayerPointers)
                     {
-                        if (players[pp].health < minHP)
+                        if (currentState.players[pp].health < minHP)
                         {
-                            target = players[pp];
-                            minHP = players[pp].health;
+                            target = currentState.players[pp];
+                            minHP = currentState.players[pp].health;
                         }
                     }                
                     action = new Action(ACTION_TYPE.ATTACK, actionDealer, target);
                     break;
                 
-                case STRATEGY.RANDOM_TARGET:
+                case STRATEGY.RANDOM_ACTION:
                     Random rand = new Random();
                     action = new Action(ACTION_TYPE.ATTACK, actionDealer, 
-						players[alivePlayerPointers[rand.Next(alivePlayerPointers.Count)]]);
+						currentState.players[alivePlayerPointers[rand.Next(alivePlayerPointers.Count)]]);
                     break;                
             }
     
@@ -191,7 +217,11 @@ namespace AG
             }
             return sum;
         }
+
+
         
+
+		/******************** OUTPUT ********************/
         public static void outputGraph(List<GameState> graph, GameState root) 
         {
             foreach(GameState n in graph)
