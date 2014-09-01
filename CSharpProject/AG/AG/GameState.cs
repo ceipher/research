@@ -118,51 +118,8 @@ namespace AG
 				if (source.mana < 0) source.mana = 0;
 				break;
 			}
-
-
 		}
 
-		/****
-		public List<GameState> GetSampleChildren()
-		{
-			Random rand = new Random();
-			List<GameState> children = new List<GameState>();
-			for (int i = 0; i < Global.CHILDREN_SAMPLING; i++) 
-			{
-				GameState newChild = new GameState(players, enemies, playersPotionLeft);
-				newChild.parent = this;
-				for (int playerIndex = 0; playerIndex < newChild.players.Count; playerIndex++)
-				{
-					Action playerAction;
-					Character player = newChild.players[playerIndex];
-					if (newChild.playersPotionLeft > 0 && (new Random()).Next (100)>50) {
-						// Use Potion
-						playerAction = new Action(ACTION_TYPE.POTION, player, player);
-						newChild.playersPotionLeft--;
-						player.doAction(playerAction);
-					} else {
-						// Attack or DoNothing
-						playerAction = Utils.getPlayerStrategy(player, STRATEGY.RANDOM_ACTION, newChild);
-						
-						System.Threading.Thread.Sleep(1);
-						player.doAction(playerAction);
-					}
-					newChild.playersAction.Add(playerAction);
-				}
-				for (int enemyIndex = 0; enemyIndex < newChild.enemies.Count; enemyIndex++)
-				{
-					Action enemyAction;
-					enemyAction = Utils.getEnemyStrategy(newChild.enemies[enemyIndex], STRATEGY.LOWEST_HP_TARGET, newChild.players);
-					enemies[enemyIndex].doAction(enemyAction);
-					newChild.enemiesAction.Add(enemyAction);
-				}
-				Utils.addNode(children, newChild);
-				
-			}
-			
-			return children;
-		}
-		**/
 		public GameState Copy() 
 		{
 			List<Character> copyPlayers = new List<Character>();	

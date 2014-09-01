@@ -20,17 +20,14 @@ namespace AG
 				{
 					foreach(GameState child in state.GetAllChildren())
 					{
-						if (child.getGameState() == GAME_STATE.INPROCESS)
-						{
-							tempList.Add(child);
-							graph.Add(child);
-						}
+						tempList.Add(child);
+						graph.Add(child);
 					}
 				}
 				currentLevelStates = tempList;
 				rounds++;
-				Console.WriteLine("ROUNDS: "+rounds);
-				Console.WriteLine("Level Size: "+currentLevelStates.Count);
+				//Console.WriteLine("ROUNDS: "+rounds);
+				//Console.WriteLine("Level Size: "+currentLevelStates.Count);
 			}
 			return graph;
 		}

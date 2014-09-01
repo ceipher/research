@@ -11,14 +11,17 @@ namespace AG
     public class Utils
     {
         public static void DoPlayerAction(GameState state, int playerIndex, List<GameState> childrenList)
-        {      
-			if (getHealthSum(state.players) == 0) return;
-            if (playerIndex >= state.players.Count) 
-            {
+		{
+			if (state.getGameState () != GAME_STATE.INPROCESS) {
+				childrenList.Add(state);
+			}
+			if (getHealthSum (state.players) == 0) {
+				return;
+			}
+            if (playerIndex >= state.players.Count) {		
                 childrenList.Add(state);
                 return;
             }
-
 			Character currentPlayer = state.players[playerIndex];
 			if (currentPlayer.health <= 0) 
 			{
