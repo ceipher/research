@@ -225,7 +225,7 @@ namespace AG
         
 
 		/******************** OUTPUT ********************/
-        public static void outputGraph(List<GameState> graph, GameState root) 
+        public static void printToHTML(List<GameState> graph, GameState root) 
         {
             foreach(GameState n in graph)
             {
@@ -235,7 +235,7 @@ namespace AG
                 }
             }
 			string lines = outputGameState(root, 0);
-			FileStream fcreate = File.Open("D:\\CSharpProject\\AG\\AG\\Visualization\\data.json", FileMode.Create);
+			FileStream fcreate = File.Open("D:\\CSharpProject\\Visualization\\data.json", FileMode.Create);
             StreamWriter file = new StreamWriter(fcreate);
             file.WriteLine(lines);
             file.Close();

@@ -39,13 +39,18 @@
     <Compile Include="GameState.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Utils.cs" />
-    <Compile Include="Algorithm\BFSearch.cs" />
-    <Compile Include="Algorithm\MonteCarlo.cs" />
-    <Compile Include="Algorithm\Greedy.cs" />
-    <Compile Include="Algorithm\RRT.cs" />
     <Compile Include="GameControl.cs" />
+    <Compile Include="algorithm\BFSearch.cs" />
+    <Compile Include="algorithm\MonteCarlo.cs" />
+    <Compile Include="algorithm\Greedy.cs" />
+    <Compile Include="algorithm\RRT.cs" />
+    <Compile Include="algorithmtest\SleepUseTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Algorithm\" />
+    <Folder Include="algorithm\" />
+    <Folder Include="algorithmtest\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="nunit.framework" />
   </ItemGroup>
 </Project>

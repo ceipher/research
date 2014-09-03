@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRecord xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Results>
+    <UnitTestResult>
+      <TestDate>2014-09-03T13:53:06</TestDate>
+      <Passed>0</Passed>
+      <Errors>0</Errors>
+      <Failures>0</Failures>
+      <Inconclusive>0</Inconclusive>
+      <NotRunnable>0</NotRunnable>
+      <Skipped>0</Skipped>
+      <Ignored>0</Ignored>
+      <Time />
+      <Message>未能加载文件或程序集“AG, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null”或它的某一个依赖项。试图加载格式不正确的程序。</Message>
+      <StackTrace>
+Server stack trace: 
+   在 System.Reflection.RuntimeAssembly._nLoad(AssemblyName fileName, String codeBase, Evidence assemblySecurity, RuntimeAssembly locationHint, StackCrawlMark&amp; stackMark, IntPtr pPrivHostBinder, Boolean throwOnFileNotFound, Boolean forIntrospection, Boolean suppressSecurityChecks)
+   在 System.Reflection.RuntimeAssembly.InternalLoadAssemblyName(AssemblyName assemblyRef, Evidence assemblySecurity, RuntimeAssembly reqAssembly, StackCrawlMark&amp; stackMark, IntPtr pPrivHostBinder, Boolean throwOnFileNotFound, Boolean forIntrospection, Boolean suppressSecurityChecks)
+   在 System.Reflection.Assembly.Load(AssemblyName assemblyRef)
+   在 NUnit.Core.Builders.TestAssemblyBuilder.Load(String path)
+   在 NUnit.Core.Builders.TestAssemblyBuilder.Build(String assemblyName, Boolean autoSuites)
+   在 NUnit.Core.Builders.TestAssemblyBuilder.Build(String assemblyName, String testName, Boolean autoSuites)
+   在 NUnit.Core.TestSuiteBuilder.BuildSingleAssembly(TestPackage package)
+   在 NUnit.Core.TestSuiteBuilder.Build(TestPackage package)
+   在 NUnit.Core.SimpleTestRunner.Load(TestPackage package)
+   在 NUnit.Core.ProxyTestRunner.Load(TestPackage package)
+   在 NUnit.Core.ProxyTestRunner.Load(TestPackage package)
+   在 NUnit.Core.RemoteTestRunner.Load(TestPackage package)
+   在 MonoDevelop.NUnit.External.NUnitTestRunner.Run(EventListener listener, ITestFilter filter, String path, String suiteName, List`1 supportAssemblies, String testRunnerType, String testRunnerAssembly) 位置 c:\BuildAgent\work\d478831d940d36a4\monodevelop\main\src\addins\NUnit\NUnitRunner\NUnitTestRunner.cs:行号 103
+   在 MonoDevelop.NUnit.External.NUnitTestRunner.Run(EventListener listener, ITestFilter filter, String path, String suiteName, List`1 supportAssemblies, String testRunnerType, String testRunnerAssembly)
+   在 MonoDevelop.NUnit.External.ExternalTestRunner.Run(IRemoteEventListener listener, ITestFilter filter, String path, String suiteName, List`1 supportAssemblies, String testRunnerType, String testRunnerAssembly) 位置 c:\BuildAgent\work\d478831d940d36a4\monodevelop\main\src\addins\NUnit\Services\ExternalTestRunner.cs:行号 83
+   在 System.Runtime.Remoting.Messaging.StackBuilderSink._PrivateProcessMessage(IntPtr md, Object[] args, Object server, Object[]&amp; outArgs)
+   在 System.Runtime.Remoting.Messaging.StackBuilderSink.SyncProcessMessage(IMessage msg)
+
+Exception rethrown at [0]: 
+   在 MonoDevelop.NUnit.NUnitAssemblyTestSuite.RunUnitTest(UnitTest test, String suiteName, String pathName, String testName, TestContext testContext) 位置 c:\BuildAgent\work\d478831d940d36a4\monodevelop\main\src\addins\NUnit\Services\NUnitAssemblyTestSuite.cs:行号 402
+   在 MonoDevelop.NUnit.NUnitAssemblyTestSuite.OnRun(TestContext testContext) 位置 c:\BuildAgent\work\d478831d940d36a4\monodevelop\main\src\addins\NUnit\Services\NUnitAssemblyTestSuite.cs:行号 333
+   在 MonoDevelop.NUnit.NUnitProjectTestSuite.OnRun(TestContext testContext) 位置 c:\BuildAgent\work\d478831d940d36a4\monodevelop\main\src\addins\NUnit\Services\NUnitProjectTestSuite.cs:行号 123
+   在 MonoDevelop.NUnit.UnitTest.Run(TestContext testContext) 位置 c:\BuildAgent\work\d478831d940d36a4\monodevelop\main\src\addins\NUnit\Services\UnitTest.cs:行号 361</StackTrace>
+    </UnitTestResult>
+  </Results>
+</TestRecord>

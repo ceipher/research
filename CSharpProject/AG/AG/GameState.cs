@@ -206,12 +206,12 @@ namespace AG
 		public override String ToString() 
 		{
 			String s = "";
-			s+="p[";
+			s += "p[";
 			foreach (Character p in players)
 			{
 				s += p.health+"-";
 			}
-			s+="]-e[";
+			s += "]-e[";
 			foreach (Character e in enemies)
 			{
 				s += e.health;
@@ -221,8 +221,10 @@ namespace AG
 				}
 				s+= "-";
 			}
-			s+="]";
-			s+="-potions["+playersPotionLeft+"]";
+			s += "]";
+			s += "-potions["+playersPotionLeft+"]";
+			s += " PlayerTeam: " + Utils.getHealthSum (players)
+				+ " EnemyTeam: " + Utils.getHealthSum (enemies);
 			return s;
 		}
 				

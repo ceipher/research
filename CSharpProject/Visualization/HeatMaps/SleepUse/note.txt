@@ -1,0 +1,12 @@
+related to:
+enemy team health
+enmey team attack
+companion team attack*
+
+
+*If in evaluation, total companion team health is top priority than # of rounds, 
+then sleep is always used, except when companion attack is high enough to kill corresponding enmey in 1 round
+
+
+Dominant strategy for infinite health for both
+

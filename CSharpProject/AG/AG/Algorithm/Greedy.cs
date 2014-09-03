@@ -15,6 +15,7 @@ namespace AG
 			while(true)
 			{
 				GameState newState = current.Copy();
+				GameControl.RoundBegin(newState);
 				foreach(Character p in newState.players)
 				{
 					Action pAction = Utils.getPlayerStrategy(p, STRATEGY.RANDOM_ACTION, newState);

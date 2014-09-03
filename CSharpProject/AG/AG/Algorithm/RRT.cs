@@ -67,29 +67,20 @@ namespace AG
 			}
 			
 			//Phase 2 - choose best node among selected node and its children
-			List<GameState> currentPool = new List<GameState>();
 			List<GameState> validNodes = new List<GameState>();
-			currentPool.Add(best);
+			validNodes.Add(best);
 			if (best.exploredChildren.Count == 0) // check if the node's children get explored
 			{
 				foreach(GameState child in best.GetAllChildren())
 				{
-					currentPool.Add(child);
+					validNodes.Add(child);
 					best.exploredChildren.Add(child);
 				}
 			} else {
 				foreach(GameState explored in best.exploredChildren)
 				{
-					currentPool.Add(explored);
+					validNodes.Add(explored);
 				}
-			}
-			
-			foreach (GameState node in currentPool)
-			{
-				if (true)//candidate.isNodeEqualSmaller(node))
-				{
-					validNodes.Add(node);
-				}					
 			}
 					
 			GameState closestNode = root;
@@ -97,6 +88,11 @@ namespace AG
 			
 			foreach (GameState node in validNodes)
 			{
+				if (node.getGameState() == GAME_STATE.PLAYER_WIN){
+					node.nodeType = GameState.NODE_TYPE.IN_RRT;
+					Utils.addNode(graph, node);
+					return;
+				}
 				double distance = findDistance(node, candidate);
 				if (distance < minDistance)
 				{
