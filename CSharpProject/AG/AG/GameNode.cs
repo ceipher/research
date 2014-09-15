@@ -4,11 +4,11 @@ using System.Collections.Generic;
 namespace AG
 {
 	public enum GAME_STATE {PLAYER_WIN, ENEMY_WIN, INPROCESS};
-	public class GameState
+	public class GameNode
 	{
 		public enum NODE_TYPE {IN_EXPLORED, IN_RRT, IN_OPTIMAL};
 		
-		public GameState parent;		
+		public GameNode parent;		
 		public List<Character> players;
 		public List<Action> playersAction = new List<Action>();
 		public int playersPotionLeft;
@@ -18,11 +18,11 @@ namespace AG
 		public int N = 0;//MonteCarlo
 		public float Q = 0;//MonteCarlo
 		public bool isExpanded = false;//MonteCarlo
-		public List<GameState> exploredChildren = new List<GameState>();//MonteCarlo & RRT
+		public List<GameNode> exploredChildren = new List<GameNode>();//MonteCarlo & RRT
 		public NODE_TYPE nodeType = NODE_TYPE.IN_EXPLORED;//RRT
-		public List<GameState> rrtChildren = new List<GameState>();//RRT Display
+		public List<GameNode> rrtChildren = new List<GameNode>();//RRT Display
 		
-		public GameState(List<Character> pplayers, List<Character> penemies, int playersPotions) 
+		public GameNode(List<Character> pplayers, List<Character> penemies, int playersPotions) 
 		{
 			players = new List<Character>();
 			foreach(Character player in pplayers)
@@ -40,19 +40,19 @@ namespace AG
 			}
 		}
 
-		public List<GameState> GetAllChildren()
+		public List<GameNode> GetAllChildren()
 		{
-			List<GameState> allChildren = new List<GameState>();
-			if (this.getGameState() != GAME_STATE.INPROCESS) return allChildren;
+			List<GameNode> allChildren = new List<GameNode>();
+			if (this.getNodeState() != GAME_STATE.INPROCESS) return allChildren;
 			
-			List<GameState> playerTurnChildren = new List<GameState>();
+			List<GameNode> playerTurnChildren = new List<GameNode>();
 			Utils.DoPlayerAction(this,0,playerTurnChildren);// Player turn
-			foreach(GameState s in playerTurnChildren)// Enmey turn
+			foreach(GameNode s in playerTurnChildren)// Enmey turn
 			{
 				foreach(Character e in s.enemies)
 				{
 					Action enemyAction;
-					enemyAction = Utils.getEnemyStrategy(e, STRATEGY.LOWEST_HP_TARGET, s);
+					enemyAction = StrategyForEnemy.NextAction(e, STRATEGY.LOWEST_HP_TARGET, s);
 					s.doAction(enemyAction);
 					s.enemiesAction.Add(enemyAction);
 				}
@@ -120,7 +120,7 @@ namespace AG
 			}
 		}
 
-		public GameState Copy() 
+		public GameNode Copy() 
 		{
 			List<Character> copyPlayers = new List<Character>();	
 			List<Character> copyEnemies = new List<Character>();
@@ -142,13 +142,13 @@ namespace AG
 			{
 				copyEnemieActions.Add(a);
 			}
-			GameState newState = new GameState(copyPlayers, copyEnemies, playersPotionLeft);
+			GameNode newState = new GameNode(copyPlayers, copyEnemies, playersPotionLeft);
 			newState.playersAction = copyPlayerActions;
 			newState.enemiesAction = copyEnemieActions;
 			return newState;
 		}
 
-		public bool isEqual(GameState other)
+		public bool isEqual(GameNode other)
 		{
 			bool result = true;
 			for (int i = 0; i < players.Count; i++) 
@@ -162,7 +162,7 @@ namespace AG
 			return result;
 		}
 		
-		public bool isNodeEqualSmaller(GameState target)
+		public bool isNodeEqualSmaller(GameNode target)
 		{
 			bool result = true;
 			for (int i = 0; i < target.players.Count; i++)
@@ -184,7 +184,7 @@ namespace AG
 		
 		public int getRounds()
 		{
-			GameState temp = this;
+			GameNode temp = this;
 			int count = 0;
 			while(temp.parent!=null)
 			{
@@ -196,7 +196,7 @@ namespace AG
 		
 		public void markOptimal()
 		{
-			this.nodeType = GameState.NODE_TYPE.IN_OPTIMAL;
+			this.nodeType = GameNode.NODE_TYPE.IN_OPTIMAL;
 			if (this.parent != null)
 			{
 				this.parent.markOptimal();
@@ -247,7 +247,7 @@ namespace AG
 		}
 		
 		
-		public GAME_STATE getGameState()
+		public GAME_STATE getNodeState()
 		{
 			if (Utils.getHealthSum(players) > 0 && Utils.getHealthSum(enemies) == 0)
 			{

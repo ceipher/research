@@ -6,19 +6,19 @@ namespace AG
 {
 	public class BFSearch
 	{
-		public static List<GameState> Build(GameState rootState)
+		public static List<GameNode> Build(GameNode rootState)
 		{
-			List<GameState> graph = new List<GameState>();
-			List<GameState> currentLevelStates = new List<GameState>();
+			List<GameNode> graph = new List<GameNode>();
+			List<GameNode> currentLevelStates = new List<GameNode>();
 			currentLevelStates.Add(rootState);
 			int rounds = 0;
 			while(currentLevelStates.Count != 0)
 			{
 				
-				List<GameState> tempList = new List<GameState>();
-				foreach(GameState state in currentLevelStates)
+				List<GameNode> tempList = new List<GameNode>();
+				foreach(GameNode state in currentLevelStates)
 				{
-					foreach(GameState child in state.GetAllChildren())
+					foreach(GameNode child in state.GetAllChildren())
 					{
 						tempList.Add(child);
 						graph.Add(child);
@@ -26,12 +26,11 @@ namespace AG
 				}
 				currentLevelStates = tempList;
 				rounds++;
-				//Console.WriteLine("ROUNDS: "+rounds);
-				//Console.WriteLine("Level Size: "+currentLevelStates.Count);
+				Console.WriteLine("ROUNDS: "+rounds);
+				Console.WriteLine("Level Size: "+currentLevelStates.Count);
 			}
 			return graph;
-		}
-		
+		}		
 	}
 }
 

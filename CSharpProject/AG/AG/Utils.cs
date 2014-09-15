@@ -10,9 +10,38 @@ namespace AG
     
     public class Utils
     {
-        public static void DoPlayerAction(GameState state, int playerIndex, List<GameState> childrenList)
+		public static GameNode GetBest(List<GameNode> graph)
 		{
-			if (state.getGameState () != GAME_STATE.INPROCESS) {
+			if (graph == null || graph.Count == 0)
+				return null;
+
+			double minNodeScore = double.MaxValue;
+			GameNode best = graph[0];
+			foreach(GameNode nn in graph)
+			{			
+				int val = Utils.getHealthSum(nn.enemies);
+				if (minNodeScore > val) {
+					// 1st - enemies' health
+					minNodeScore = val;
+					best = nn;
+				} else if (minNodeScore == val)	{
+					if (Utils.getHealthSum(nn.players) > Utils.getHealthSum(best.players)) {
+						// 2nd - players' health
+						best = nn;
+					} else  if (Utils.getHealthSum(nn.players) == Utils.getHealthSum(best.players)) {
+						if (nn.getRounds() < best.getRounds()) {
+							// 3rd - # of rounds
+							best = nn;
+						} 
+					}
+				}
+			}
+			return best;
+		}
+
+        public static void DoPlayerAction(GameNode state, int playerIndex, List<GameNode> childrenList)
+		{
+			if (state.getNodeState () != GAME_STATE.INPROCESS) {
 				childrenList.Add(state);
 			}
 			if (getHealthSum (state.players) == 0) {
@@ -25,7 +54,7 @@ namespace AG
 			Character currentPlayer = state.players[playerIndex];
 			if (currentPlayer.health <= 0) 
 			{
-				GameState nextState = state.Copy();if (playerIndex == 0) GameControl.RoundBegin(nextState);
+				GameNode nextState = state.Copy();if (playerIndex == 0) RoundControl.RoundBegin(nextState);
 
 				Action noAction =  Action.NoAction(nextState.players[playerIndex]);
 				nextState.doAction(noAction);
@@ -36,7 +65,7 @@ namespace AG
             for(int i = 0; i < state.enemies.Count; i++)
             {
 				if ( state.enemies[i].health <= 0 ) continue;
-				GameState nextState = state.Copy(); if (playerIndex == 0) GameControl.RoundBegin(nextState);
+				GameNode nextState = state.Copy(); if (playerIndex == 0) RoundControl.RoundBegin(nextState);
 
 				Character source = nextState.players[playerIndex];
 				Character target = nextState.enemies[i];     
@@ -47,7 +76,7 @@ namespace AG
 
 				foreach(Magic magic in currentPlayer.magics) {
 					if (magic.manaCost > currentPlayer.mana) continue;
-					nextState = state.Copy (); if (playerIndex == 0) GameControl.RoundBegin(nextState);
+					nextState = state.Copy (); if (playerIndex == 0) RoundControl.RoundBegin(nextState);
 					source = nextState.players[playerIndex];
 					target = nextState.enemies[i]; 
 					action = new Action(ACTION_TYPE.MAGIC, magic, source, target);
@@ -57,7 +86,7 @@ namespace AG
 				}
             }
 			if (state.playersPotionLeft > 0) {
-				GameState nextState = state.Copy(); if (playerIndex == 0) GameControl.RoundBegin(nextState);
+				GameNode nextState = state.Copy(); if (playerIndex == 0) RoundControl.RoundBegin(nextState);
 				Character source = nextState.players[playerIndex];
 				Character target = nextState.players[playerIndex];
 				Action action = new Action(ACTION_TYPE.POTION, source, target);
@@ -65,130 +94,13 @@ namespace AG
 				nextState.playersAction.Add(action);
 				DoPlayerAction(nextState, playerIndex+1, childrenList);
 			}
-
-
         }
-
-		public static Action getPlayerStrategy(Character actionDealer, STRATEGY strategy, GameState currentState) 
-        {
-			
-			Action action = Action.NoAction (actionDealer);
-			if (actionDealer.health <= 0) return action;
-
-			Character target = null;
-            /* non-waste-damage mechanism */
-            List<int> aliveEnemyPointers = new List<int>();
-            for(int j = 0; j < currentState.enemies.Count; j++) 
-            {
-                if (currentState.enemies[j].health > 0) 
-                {
-                    aliveEnemyPointers.Add(j);
-                }
-            }
-            if (aliveEnemyPointers.Count == 0) return action;
-            
-            /** Strategy implementation **/
-            switch(strategy)
-            {
-                case STRATEGY.RANDOM_ACTION:            
-                    Random rand = new Random();
-					List<Action> actionsAvailable = currentState.getAvailableActions(actionDealer);
-					action = actionsAvailable[rand.Next(actionsAvailable.Count)];
-                    break;        
-                        
-                case STRATEGY.LOWEST_HP_TARGET:
-                    int minHP = int.MaxValue;
-                    foreach (int pp in aliveEnemyPointers)
-                    {
-                        if (currentState.enemies[pp].health < minHP)
-                        {
-                            target = currentState.enemies[pp];
-                            minHP = currentState.enemies[pp].health;
-                        }
-                    }    
-                    action = new Action(ACTION_TYPE.ATTACK, actionDealer, target);
-                    break;
-                
-                case STRATEGY.HIGHEST_ATTACK_TARGET:
-                    int maxAttack = int.MinValue;
-                    foreach (int pp in aliveEnemyPointers) 
-                    {
-                        if (currentState.enemies[pp].attack > maxAttack)
-                        {
-                            target = currentState.enemies[pp];
-                            maxAttack = currentState.enemies[pp].attack;
-                        }
-                    }
-                    action = new Action(ACTION_TYPE.ATTACK, actionDealer, target);
-                    break;
-                    
-                case STRATEGY.THREAT_TARGET:
-                    int maxThreatValue = int.MinValue;
-                    foreach (int pp in aliveEnemyPointers)
-                    {
-                        int threatValue = currentState.enemies[pp].attack * (getHealthSum(currentState.enemies) - currentState.enemies[pp].health);
-                        if (threatValue > maxThreatValue)
-                        {
-                            target = currentState.enemies[pp];
-                            maxThreatValue = threatValue;
-                        }
-                    }
-                    action = new Action(ACTION_TYPE.ATTACK, actionDealer, target);
-                    break;
-            }
-                
-            return action;
-        }
-        
-        public static Action getEnemyStrategy(Character actionDealer, STRATEGY strategy, GameState currentState) 
-        {
-			
-            Action action = Action.NoAction(actionDealer);
-			if (!actionDealer.isNormal ()) {
-				return action;
-			}
-            Character target = null;
-            List<int> alivePlayerPointers = new List<int>();
-            for(int j = 0; j < currentState.players.Count; j++) 
-            {
-                if (currentState.players[j].health > 0)
-                {
-                    alivePlayerPointers.Add(j);
-                }
-            }
-            if (alivePlayerPointers.Count == 0) return action;
-            
-            /** Strategy implementation **/
-            switch (strategy)
-            {
-                case STRATEGY.LOWEST_HP_TARGET:    
-                    int minHP = int.MaxValue;
-                    foreach (int pp in alivePlayerPointers)
-                    {
-                        if (currentState.players[pp].health < minHP)
-                        {
-                            target = currentState.players[pp];
-                            minHP = currentState.players[pp].health;
-                        }
-                    }                
-                    action = new Action(ACTION_TYPE.ATTACK, actionDealer, target);
-                    break;
-                
-                case STRATEGY.RANDOM_ACTION:
-                    Random rand = new Random();
-                    action = new Action(ACTION_TYPE.ATTACK, actionDealer, 
-						currentState.players[alivePlayerPointers[rand.Next(alivePlayerPointers.Count)]]);
-                    break;                
-            }
-    
-			return action;
-        }
-        
-        public static void addNode(List<GameState> graph, GameState n)
+	
+        public static void addNode(List<GameNode> graph, GameNode n)
         {
             // remove duplicates
             bool exist = false;
-            foreach(GameState node in graph)
+            foreach(GameNode node in graph)
             {
                 if (node.isEqual(n))
                 {
@@ -225,9 +137,9 @@ namespace AG
         
 
 		/******************** OUTPUT ********************/
-        public static void printToHTML(List<GameState> graph, GameState root) 
+        public static void printToHTML(List<GameNode> graph, GameNode root) 
         {
-            foreach(GameState n in graph)
+            foreach(GameNode n in graph)
             {
                 if (n.parent != null)
                 {
@@ -241,7 +153,7 @@ namespace AG
             file.Close();
         }
         
-        private static string outputGameState(GameState node, int level)
+        private static string outputGameState(GameNode node, int level)
         {
             string output = "\r\n" + indent(level) + "{\r\n";
             
@@ -249,16 +161,16 @@ namespace AG
             output += indent(level) + "\"name\": \"" + node.ToString() + "\"";
             switch (node.nodeType)
             {
-                case GameState.NODE_TYPE.IN_EXPLORED:
+                case GameNode.NODE_TYPE.IN_EXPLORED:
                         
                     output += ",\r\n" + indent(level) + "\"type\": " + "0";
                     break;
                 
-                case GameState.NODE_TYPE.IN_RRT:
+                case GameNode.NODE_TYPE.IN_RRT:
                     output += ",\r\n" + indent(level) + "\"type\": " + "1";
                     break;    
                 
-                case GameState.NODE_TYPE.IN_OPTIMAL:
+                case GameNode.NODE_TYPE.IN_OPTIMAL:
                     output += ",\r\n" + indent(level) + "\"type\": " + "2";
                     break;
                 
@@ -274,16 +186,16 @@ namespace AG
                 output += ",\r\n" + indent(level) + "\"children\": " + "[";
                 if (node.rrtChildren.Count > 0) 
                 {            
-                    foreach (GameState child in node.rrtChildren)
+                    foreach (GameNode child in node.rrtChildren)
                     {
                         output += "\t" + outputGameState(child, level) + ",";
                     }    
                 }
                 if (node.exploredChildren.Count > 0)
                 {
-                    foreach (GameState child in node.exploredChildren)
+                    foreach (GameNode child in node.exploredChildren)
                     {
-                        if (child.nodeType == GameState.NODE_TYPE.IN_EXPLORED) {
+                        if (child.nodeType == GameNode.NODE_TYPE.IN_EXPLORED) {
                             output += "\t" + outputGameState(child, level) + ",";
                         }
                     }
@@ -305,7 +217,7 @@ namespace AG
             return indent;
         }
         
-        public static void printNodePath(GameState n, int count, List<GameState> path)
+        public static void printNodePath(GameNode n, int count, List<GameNode> path)
         {
             if (n.parent != null)
             {
@@ -316,7 +228,7 @@ namespace AG
                 
                 Console.WriteLine("Best Path:");
                 Console.WriteLine(n.ToString());
-                foreach(GameState nn in path)
+                foreach(GameNode nn in path)
                 {
                     Console.WriteLine("↓ " + nn.ToString());
                 }            

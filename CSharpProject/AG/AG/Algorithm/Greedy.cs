@@ -6,32 +6,32 @@ namespace AG
 {
 	public class Greedy
 	{		 
-		public static List<GameState> Build(GameState rootState)
+		public static List<GameNode> Build(GameNode rootState)
 		{
-			List<GameState> graph = new List<GameState>();
-			GameState current = rootState;
+			List<GameNode> graph = new List<GameNode>();
+			GameNode current = rootState;
 			graph.Add(current);
-			if (current.getGameState() != GAME_STATE.INPROCESS) return graph;
+			if (current.getNodeState() != GAME_STATE.INPROCESS) return graph;
 			while(true)
 			{
-				GameState newState = current.Copy();
-				GameControl.RoundBegin(newState);
+				GameNode newState = current.Copy();
+				RoundControl.RoundBegin(newState);
 				foreach(Character p in newState.players)
 				{
-					Action pAction = Utils.getPlayerStrategy(p, STRATEGY.RANDOM_ACTION, newState);
+					Action pAction = StrategyForPlayer.NextAction(p, STRATEGY.RANDOM_ACTION, newState);
 					newState.doAction(pAction);
 					newState.playersAction.Add(pAction);
 				}
 				foreach(Character e in newState.enemies)
 				{
-					Action eAction = Utils.getEnemyStrategy(e, STRATEGY.LOWEST_HP_TARGET, newState);
+					Action eAction = StrategyForEnemy.NextAction(e, STRATEGY.LOWEST_HP_TARGET, newState);
 					newState.doAction(eAction);
 					newState.enemiesAction.Add(eAction);
 				}
 				newState.parent = current;
 				graph.Add(newState);
 				
-				if (newState.getGameState() != GAME_STATE.INPROCESS) 
+				if (newState.getNodeState() != GAME_STATE.INPROCESS) 
 				{
 					break;
 				} else {

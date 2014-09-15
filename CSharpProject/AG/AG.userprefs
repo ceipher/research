@@ -1,29 +1,12 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="AG\Application.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="AG\Utils.cs">
     <Files>
-      <File FileName="AG\Application.cs" Line="86" Column="3" />
-      <File FileName="AG\algorithmtest\SleepUseTest.cs" Line="21" Column="4" />
+      <File FileName="AG\Application.cs" Line="1" Column="1" />
+      <File FileName="AG\Utils.cs" Line="33" Column="8" />
+      <File FileName="AG\algorithmtest\SleepUseTest.cs" Line="1" Column="1" />
+      <File FileName="AG\Global.cs" Line="1" Column="1" />
     </Files>
-    <Pads>
-      <Pad Id="ProjectPad">
-        <State expanded="True">
-          <Node name="AG" expanded="True">
-            <Node name="algorithmtest" expanded="True" />
-            <Node name="Application.cs" selected="True" />
-          </Node>
-        </State>
-      </Pad>
-      <Pad Id="ClassPad">
-        <State expanded="True" selected="True" />
-      </Pad>
-      <Pad Id="MonoDevelop.Debugger.WatchPad">
-        <State />
-      </Pad>
-      <Pad Id="MonoDevelop.NUnit.TestPad">
-        <State expanded="True" selected="True" />
-      </Pad>
-    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />

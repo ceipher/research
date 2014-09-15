@@ -5,26 +5,26 @@ namespace AG
 	public class MonteCarlo
 	{ 
 		
-		private static  float Cp = 1 / (float) Math.Sqrt (2);
+		private static  float Cp =  1 / (float) Math.Sqrt(2) ;
 		
-		public static List<GameState> Build(GameState rootState)
+		public static List<GameNode> Build(GameNode rootState)
 		{
-			List<GameState> graph = new List<GameState>();
-			GameState current = rootState;
+			List<GameNode> graph = new List<GameNode>();
+			GameNode current = rootState;
 			graph.Add(current);
 			
 			int i = 0;
-			GameState v0 = rootState;
+			GameNode v0 = rootState;
 			while(i < Global.MAX_ITERATION)
 			{
-				GameState vl = TreePolicy(v0);
+				GameNode vl = TreePolicy(v0);
 				if (vl == null) break;
 				float delta = DefaultPolicy(vl);
 				Backup(vl,delta);
 				i++;
 			}
-			GameState ve = v0;
-			while(ve.getGameState() == GAME_STATE.INPROCESS)
+			GameNode ve = v0;
+			while(ve.getNodeState() == GAME_STATE.INPROCESS)
 			{
 				ve = BestChild(ve,0);
 				if (ve == null)
@@ -36,9 +36,9 @@ namespace AG
 			return graph;
 		}
 		
-		private static GameState TreePolicy(GameState v)
+		private static GameNode TreePolicy(GameNode v)
 		{
-			while(v!= null && v.getGameState() == GAME_STATE.INPROCESS)
+			while(v!= null && v.getNodeState() == GAME_STATE.INPROCESS)
 			{
 				if (v.exploredChildren.Count ==0){
 					v.exploredChildren = v.GetAllChildren();
@@ -53,9 +53,9 @@ namespace AG
 			return v;
 		}
 		
-		private static GameState Expand(GameState v)
+		private static GameNode Expand(GameNode v)
 		{
-			foreach(GameState s in v.exploredChildren)
+			foreach(GameNode s in v.exploredChildren)
 			{
 				if (!s.isExpanded) 
 				{
@@ -67,14 +67,14 @@ namespace AG
 			return null;
 		}
 		
-		private static bool isFullyExpanded(GameState v)
+		private static bool isFullyExpanded(GameNode v)
 		{
-			if (v.getGameState() != GAME_STATE.INPROCESS && v.exploredChildren.Count == 0)
+			if (v.getNodeState() != GAME_STATE.INPROCESS && v.exploredChildren.Count == 0)
 			{
 				// Terminal State
 				return true;
 			}
-			foreach(GameState s in v.exploredChildren)
+			foreach(GameNode s in v.exploredChildren)
 			{
 				if (s.isExpanded == false)
 				{
@@ -84,11 +84,11 @@ namespace AG
 			return true;
 		}
 		
-		private static GameState BestChild(GameState v, float c)
+		private static GameNode BestChild(GameNode v, float c)
 		{
-			GameState best = null;
+			GameNode best = null;
 			float currentValue = float.MinValue;
-			foreach(GameState vprime in v.exploredChildren)
+			foreach(GameNode vprime in v.exploredChildren)
 			{
 				float mcValue = (vprime.Q / vprime.N)
 					+ c * (float) Math.Sqrt(2 * Math.Log(v.N) / vprime.N);
@@ -101,20 +101,20 @@ namespace AG
 			return best;
 		}
 		
-		private static float DefaultPolicy(GameState v)
+		private static float DefaultPolicy(GameNode v)
 		{
-			GameState current = v;
-			while(current.getGameState() == GAME_STATE.INPROCESS)
+			GameNode current = v;
+			while(current.getNodeState() == GAME_STATE.INPROCESS)
 			{
-				GameState newState = current.Copy();
+				GameNode newState = current.Copy();
 				foreach(Character p in newState.players)
 				{
-					Action pAction = Utils.getPlayerStrategy(p, STRATEGY.RANDOM_ACTION, newState);
+					Action pAction = StrategyForPlayer.NextAction(p, STRATEGY.LOWEST_HP_TARGET, newState);
 					newState.doAction(pAction);
 				}
 				foreach(Character e in newState.enemies)
 				{
-					Action eAction = Utils.getEnemyStrategy(e, STRATEGY.LOWEST_HP_TARGET, newState);
+					Action eAction = StrategyForEnemy.NextAction(e, STRATEGY.LOWEST_HP_TARGET, newState);
 					newState.doAction(eAction);
 				}
 				current = newState;
@@ -123,7 +123,7 @@ namespace AG
 			return Utils.getHealthSum(current.players) / Utils.getMaxHealthSum(current.players);
 		}
 		
-		private static void Backup(GameState v, float delta)
+		private static void Backup(GameNode v, float delta)
 		{
 			while (v != null)
 			{

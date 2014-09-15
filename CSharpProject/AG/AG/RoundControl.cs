@@ -1,13 +1,13 @@
 using System;
 namespace AG
 {
-	public class GameControl
+	public class RoundControl
 	{
-		public GameControl ()
+		public RoundControl ()
 		{
 		}
 
-		public static void RoundBegin(GameState state){
+		public static void RoundBegin(GameNode state){
 			foreach(Character c in state.players)
 			{
 				if (c.debuffLeft > 0) c.debuffLeft--;

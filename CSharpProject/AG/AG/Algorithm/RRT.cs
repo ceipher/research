@@ -11,24 +11,24 @@ namespace AG
 		public static List<Character> enemies;
 		public static int K = Global.MAX_ITERATION;
 		
-		public static List<GameState> Build(GameState rootState)
+		public static List<GameNode> Build(GameNode rootState)
 		{
 			players = rootState.players;
 			enemies = rootState.enemies;
 			
-			List<GameState> graph = new List<GameState>();
+			List<GameNode> graph = new List<GameNode>();
 			graph.Add(rootState);
 			Random rand = new Random();
 			for (int i = 0; i < K; i++)  //K iterations
 			{
-				GameState sample = sampleNode(rand);
+				GameNode sample = sampleNode(rand);
 				connect(sample, graph, graph[0]);
 			}
 			return graph;
 		}
 			
 		
-		private static GameState sampleNode(Random rand) 
+		private static GameNode sampleNode(Random rand) 
 		{
 			List<Character> randPlayers = new List<Character>();
 			List<Character> randEnemies = new List<Character>();
@@ -45,15 +45,15 @@ namespace AG
 				randEnemy.health = rand.Next (enemies[j].maxHealth);
 				randEnemies.Add(randEnemy);
 			}
-			return new GameState(randPlayers,randEnemies,0);
+			return new GameNode(randPlayers,randEnemies,0);
 		}
 
-		static private void connect(GameState candidate, List<GameState> graph, GameState root)
+		static private void connect(GameNode candidate, List<GameNode> graph, GameNode root)
 		{
 			//Phase 1 - choose best node in graph
-			GameState best = root;
+			GameNode best = root;
 			double min = findDistance(root, candidate);
-			foreach (GameState node in graph)
+			foreach (GameNode node in graph)
 			{	
 				if (candidate.isNodeEqualSmaller(node))
 				{
@@ -67,29 +67,29 @@ namespace AG
 			}
 			
 			//Phase 2 - choose best node among selected node and its children
-			List<GameState> validNodes = new List<GameState>();
+			List<GameNode> validNodes = new List<GameNode>();
 			validNodes.Add(best);
 			if (best.exploredChildren.Count == 0) // check if the node's children get explored
 			{
-				foreach(GameState child in best.GetAllChildren())
+				foreach(GameNode child in best.GetAllChildren())
 				{
 					validNodes.Add(child);
 					best.exploredChildren.Add(child);
 				}
 			} else {
-				foreach(GameState explored in best.exploredChildren)
+				foreach(GameNode explored in best.exploredChildren)
 				{
 					validNodes.Add(explored);
 				}
 			}
 					
-			GameState closestNode = root;
+			GameNode closestNode = root;
 			double minDistance = findDistance(root, candidate);
 			
-			foreach (GameState node in validNodes)
+			foreach (GameNode node in validNodes)
 			{
-				if (node.getGameState() == GAME_STATE.PLAYER_WIN){
-					node.nodeType = GameState.NODE_TYPE.IN_RRT;
+				if (node.getNodeState() == GAME_STATE.PLAYER_WIN){
+					node.nodeType = GameNode.NODE_TYPE.IN_RRT;
 					Utils.addNode(graph, node);
 					return;
 				}
@@ -100,11 +100,11 @@ namespace AG
 					closestNode = node;
 				}
 			}
-			closestNode.nodeType = GameState.NODE_TYPE.IN_RRT;
+			closestNode.nodeType = GameNode.NODE_TYPE.IN_RRT;
 			Utils.addNode(graph, closestNode);
 		}
 	
-		private static double findDistance(GameState fromNode, GameState toNode) 
+		private static double findDistance(GameNode fromNode, GameNode toNode) 
 		{
 			double distance = 0;
 			/* method - euclidean distance */

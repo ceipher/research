@@ -36,15 +36,18 @@
     <Compile Include="Action.cs" />
     <Compile Include="Application.cs" />
     <Compile Include="Character.cs" />
-    <Compile Include="GameState.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Utils.cs" />
-    <Compile Include="GameControl.cs" />
     <Compile Include="algorithm\BFSearch.cs" />
     <Compile Include="algorithm\MonteCarlo.cs" />
     <Compile Include="algorithm\Greedy.cs" />
     <Compile Include="algorithm\RRT.cs" />
     <Compile Include="algorithmtest\SleepUseTest.cs" />
+    <Compile Include="algorithm\StrategyForPlayer.cs" />
+    <Compile Include="algorithm\StrategyForEnemy.cs" />
+    <Compile Include="RoundControl.cs" />
+    <Compile Include="GameNode.cs" />
+    <Compile Include="algorithmtest\SleepUseCases.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="algorithm\" />
