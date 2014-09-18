@@ -26,8 +26,8 @@ namespace AG
 				}
 				currentLevelStates = tempList;
 				rounds++;
-				Console.WriteLine("ROUNDS: "+rounds);
-				Console.WriteLine("Level Size: "+currentLevelStates.Count);
+				//Console.WriteLine("ROUNDS: "+rounds);
+				//Console.WriteLine("Level Size: "+currentLevelStates.Count);
 			}
 			return graph;
 		}		

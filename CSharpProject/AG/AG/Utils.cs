@@ -5,36 +5,68 @@ using AG;
 
 namespace AG
 {
-    
+	public enum BEST {TOTAL_HEALTH, ALL_ALIVE, PRIMARY_PLAYER}
     public enum STRATEGY {RANDOM_ACTION, LOWEST_HP_TARGET, HIGHEST_ATTACK_TARGET, THREAT_TARGET}
     
     public class Utils
     {
-		public static GameNode GetBest(List<GameNode> graph)
+		/**
+		 *  Return null if no winning requested node exists
+		 * 			
+		 */
+		public static GameNode GetBest(List<GameNode> graph, BEST bestType)
 		{
 			if (graph == null || graph.Count == 0)
 				return null;
+			GameNode best = graph [0];
 
-			double minNodeScore = double.MaxValue;
-			GameNode best = graph[0];
-			foreach(GameNode nn in graph)
-			{			
-				int val = Utils.getHealthSum(nn.enemies);
-				if (minNodeScore > val) {
-					// 1st - enemies' health
-					minNodeScore = val;
-					best = nn;
-				} else if (minNodeScore == val)	{
-					if (Utils.getHealthSum(nn.players) > Utils.getHealthSum(best.players)) {
-						// 2nd - players' health
-						best = nn;
-					} else  if (Utils.getHealthSum(nn.players) == Utils.getHealthSum(best.players)) {
-						if (nn.getRounds() < best.getRounds()) {
-							// 3rd - # of rounds
-							best = nn;
-						} 
+			switch (bestType) {
+
+			case BEST.TOTAL_HEALTH:
+				int minNodeScore = int.MaxValue;
+				foreach (GameNode node in graph) {			
+					int val = Utils.getHealthSum (node.enemies);
+					if (minNodeScore > val) {
+						// 1st - enemies' health
+						minNodeScore = val;
+						best = node;
+					} else if (minNodeScore == val) {
+						if (Utils.getHealthSum (node.players) > Utils.getHealthSum (best.players)) {
+							// 2nd - players' health
+							best = node;
+						} else if (Utils.getHealthSum (node.players) == Utils.getHealthSum (best.players)) {
+							if (node.getRounds () < best.getRounds ()) {
+								// 3rd - # of rounds
+								best = node;
+							} 
+						}
 					}
 				}
+				if (best.getNodeState () != GAME_STATE.PLAYER_WIN) {
+					best = null;
+				}	
+				break;
+			case BEST.ALL_ALIVE:
+				int maxPlayerTeamHealth = int.MinValue;	
+				List<GameNode> allAliveNodes = new List<GameNode> ();	
+				foreach (GameNode node in graph) {
+					if (node.getNodeState() == GAME_STATE.PLAYER_WIN
+					    && IsAllAlive(node.players)) {
+						allAliveNodes.Add(node);
+						if (getHealthSum(node.players) > maxPlayerTeamHealth) {
+							best = node;
+							maxPlayerTeamHealth = getHealthSum(node.players);
+						}
+					}
+				}
+				if (allAliveNodes.Count == 0) {
+					best = null;
+				}
+				break;
+			case BEST.PRIMARY_PLAYER:
+				break;
+			default:
+				break;
 			}
 			return best;
 		}
@@ -113,20 +145,64 @@ namespace AG
             }        
         }
         
-        public static int getHealthSum(List<Character> listOfCharacters)
+		public static bool IsAllAlive(List<Character> characterList) 
+		{
+			foreach (Character c in characterList) {
+				if (c.health <= 0) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		/**
+		 *	Assume from and to are winning node
+		 */
+		public static bool IsWinAsGoodAs(GameNode nodeA, GameNode nodeB, BEST comparator) 
+		{
+			if (nodeA.getNodeState () != GAME_STATE.PLAYER_WIN ||
+				nodeB.getNodeState () != GAME_STATE.PLAYER_WIN) {
+				return false;
+			}
+
+			bool result = false;
+			switch (comparator) {
+			case BEST.TOTAL_HEALTH:
+				if (getHealthSum(nodeA.players) == getHealthSum(nodeB.players)
+				    && nodeA.getRounds() == nodeB.getRounds()){
+					result = true;
+				}
+				break;
+			case BEST.ALL_ALIVE:
+				if (IsAllAlive(nodeA.players) && IsAllAlive(nodeB.players)
+				    && getHealthSum(nodeA.players) == getHealthSum(nodeB.players)
+				    && nodeA.getRounds() == nodeB.getRounds()) {
+					result = true;
+				}
+				break;
+			case BEST.PRIMARY_PLAYER:
+				break;
+			default:
+				break;
+			}
+
+			return result;
+		}
+
+        public static int getHealthSum(List<Character> characterList)
         {
             int sum = 0;
-            foreach (Character c in listOfCharacters)
+            foreach (Character c in characterList)
             {
                 sum += c.health;
             }
             return sum;
         }
 		
-		public static int getMaxHealthSum(List<Character> listOfCharacters)
+		public static int getMaxHealthSum(List<Character> characterList)
         {
             int sum = 0;
-            foreach (Character c in listOfCharacters)
+            foreach (Character c in characterList)
             {
                 sum += c.maxHealth;
             }
@@ -235,6 +311,8 @@ namespace AG
                 Console.WriteLine("Number of rounds: " + count);
             }
         }
+
+
 		
     }
     

@@ -76,7 +76,8 @@ namespace AG
 					{
 						foreach(Magic magic in c.magics)
 						{
-							if (magic.manaCost <= c.mana){
+							if (magic.manaCost <= c.mana
+							    && e.debuff != magic.debuff){
 								actions.Add(new Action(ACTION_TYPE.MAGIC, magic, c, e));
 							}
 						}						
