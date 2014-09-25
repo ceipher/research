@@ -48,6 +48,7 @@
     <Compile Include="RoundControl.cs" />
     <Compile Include="GameNode.cs" />
     <Compile Include="algorithmtest\SleepUseCases.cs" />
+    <Compile Include="algorithmtest\WinRateTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="algorithm\" />

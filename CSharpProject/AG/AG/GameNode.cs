@@ -224,8 +224,8 @@ namespace AG
 			}
 			s += "]";
 			s += "-potions["+playersPotionLeft+"]";
-			s += " PlayerTeam: " + Utils.getHealthSum (players)
-				+ " EnemyTeam: " + Utils.getHealthSum (enemies);
+			s += " PlayerTeam: " + Utils.GetHealthSum (players)
+				+ " EnemyTeam: " + Utils.GetHealthSum (enemies);
 			return s;
 		}
 				
@@ -250,15 +250,20 @@ namespace AG
 		
 		public GAME_STATE getNodeState()
 		{
-			if (Utils.getHealthSum(players) > 0 && Utils.getHealthSum(enemies) == 0)
+			if (Utils.GetHealthSum(players) > 0 && Utils.GetHealthSum(enemies) == 0)
 			{
 				return GAME_STATE.PLAYER_WIN;
-			} else if (Utils.getHealthSum(players) == 0 && Utils.getHealthSum(enemies) > 0)
+			} else if (Utils.GetHealthSum(players) == 0 && Utils.GetHealthSum(enemies) > 0)
 			{
 				return GAME_STATE.ENEMY_WIN;
 			} else {
 				return GAME_STATE.INPROCESS;
 			}
+		}
+
+		public float getReward()
+		{
+			return Utils.GetHealthSum(this.players);
 		}
 	}
 }

@@ -2,13 +2,8 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
   <MonoDevelop.Ide.Workbench ActiveDocument="AG\algorithmtest\SleepUseTest.cs">
     <Files>
-      <File FileName="AG\Application.cs" Line="11" Column="3" />
-      <File FileName="AG\algorithmtest\SleepUseTest.cs" Line="175" Column="54" />
-      <File FileName="AG\Utils.cs" Line="69" Column="11" />
-      <File FileName="AG\GameNode.cs" Line="80" Column="39" />
-      <File FileName="AG\Global.cs" Line="10" Column="3" />
-      <File FileName="AG\algorithm\StrategyForEnemy.cs" Line="1" Column="1" />
-      <File FileName="AG\algorithm\StrategyForPlayer.cs" Line="21" Column="6" />
+      <File FileName="AG\algorithmtest\SleepUseTest.cs" Line="11" Column="20" />
+      <File FileName="AG\Application.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

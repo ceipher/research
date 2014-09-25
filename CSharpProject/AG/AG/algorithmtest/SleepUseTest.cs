@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,7 +20,7 @@ namespace AG
 		static int AMP = 1;
 		static int HME = 1;
 		static int AME = 1;
-		static BEST bestType = BEST.TOTAL_HEALTH;
+		static BEST bestType = BEST.ATTRITION;
 
 		public static void GenerateHeapMap()
 		{
@@ -46,29 +45,29 @@ namespace AG
 			//Write To Files
 			string fileContent = "";
 			fileContent += (""
-			                + "\r\n" + "set multiplot"
-			                + "\r\n" + "set size 0.5,0.8"
-			                + "\r\n" + "set origin 0.0,0.0"
-			                + "\r\n" + "set title \"Sleep Uses On Enemy X ("+bestType.ToString()+")\""
-			                + "\r\n" + "unset key" 
-			                + "\r\n" + "set tic scale 0"
-			                + "\r\n" + "set palette rgbformula -7,2,-7"
-			                + "\r\n" + "set cbrange [-0.2:1]"
-			                + "\r\n" + "set cblabel \"Probablity of Sleep on Enemy X\""
-			                + "\r\n" + "unset cbtics"
-			                + "\r\n" + "set xlabel \"health\""
-			                + "\r\n" + "set ylabel \"attack\""
-			                + "\r\n" + "set xrange [" + (float)(minHealth-healthStepSize/2) + ":" + (float)(maxHealth+healthStepSize/2) + "]"
-			                + "\r\n" + "set yrange [" + (float)(minAttack-attackStepSize/2) + ":" + (float)(maxAttack+attackStepSize/2) + "]"
-			                + "\r\n" + "set xtics " + healthStepSize
-			                + "\r\n" + "set ytics " + attackStepSize
-			                + "\r\n" + "plot \'-\' using 1:2:3 with image");
+			       	+ "\r\n" + "set multiplot"
+			       	+ "\r\n" + "set size 0.5,0.8"
+			      	+ "\r\n" + "set origin 0.0,0.0"
+			      	+ "\r\n" + "set title \"H="+H+" A="+A+"\\nSleep Uses On Enemy X ("+bestType.ToString()+")\""
+			       	+ "\r\n" + "unset key" 
+			       	+ "\r\n" + "set tic scale 0"
+	                + "\r\n" + "set palette rgbformula -7,2,-7"
+	                + "\r\n" + "set cbrange [-0.2:1]"
+	                + "\r\n" + "set cblabel \"Probablity of Sleep on Enemy X\""
+	                + "\r\n" + "unset cbtics"
+	                + "\r\n" + "set xlabel \"health\""
+	                + "\r\n" + "set ylabel \"attack\""
+	                + "\r\n" + "set xrange [" + (float)(minHealth-healthStepSize/2) + ":" + (float)(maxHealth+healthStepSize/2) + "]"
+	                + "\r\n" + "set yrange [" + (float)(minAttack-attackStepSize/2) + ":" + (float)(maxAttack+attackStepSize/2) + "]"
+	                + "\r\n" + "set xtics " + healthStepSize
+	                + "\r\n" + "set ytics " + attackStepSize
+	                + "\r\n" + "plot \'-\' using 1:2:3 with image");
 			foreach (float[] dataline in enemyXdata) {
 				fileContent += ("\r\n" + string.Join(" ", dataline));
 			}
 			fileContent += "\r\ne";
 			fileContent += ("\r\nset origin 0.5,0.0 "
-			        + "\r\n" + "set title \"Sleep Uses On Enemy Team ("+bestType.ToString()+")\""
+			        + "\r\n" + "set title \"H="+H+" A="+A+"\\nSleep Uses On Enemy Team ("+bestType.ToString()+")\""
 			       	+ "\r\n" + "set cblabel \"Probablity of Sleep on Enemy Team\""
 			        + "\r\n" + "plot \'-\' using 1:2:3 with image");
 			foreach (float[] dataline in enemyTeamdata) {
@@ -76,8 +75,8 @@ namespace AG
 			}
 			fileContent += "\r\ne";
 			fileContent += "\r\nunset multiplot";
-			FileStream fcreate = File.Open("D:\\CSharpProject\\Visualization\\HeatMaps\\"+"H"+HMP
-			                               +"A"+AMP+"_"+bestType.ToString()+".plt", FileMode.Create);
+			FileStream fcreate = File.Open("D:\\CSharpProject\\Visualization\\HeatMaps\\"+"H"+H
+			                               +"A"+A+"_"+bestType.ToString()+".plt", FileMode.Create);
 			StreamWriter file = new StreamWriter(fcreate);
 			file.WriteLine(fileContent);
 			Console.WriteLine (fileContent);
@@ -184,7 +183,9 @@ namespace AG
 					bestSolutions.Add(node);
 				}
 			}
-			enemyXdata.Add (new float[] {minHealth+healthStepSize*i, minAttack+attackStepSize*j,
+			enemyXdata.Add (new float[] {
+				(float) healthStepSize*i+minHealth,
+				(float) attackStepSize*j+minAttack,
 				(float) sleepCountX/bestSolutions.Count});
 			enemyTeamdata.Add (new float[] {minHealth+healthStepSize*i, minAttack+attackStepSize*j,
 				(float) sleepCountTeam/bestSolutions.Count});

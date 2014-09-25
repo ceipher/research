@@ -90,7 +90,7 @@ namespace AG
 			{
 				if (node.getNodeState() == GAME_STATE.PLAYER_WIN){
 					node.nodeType = GameNode.NODE_TYPE.IN_RRT;
-					Utils.addNode(graph, node);
+					Utils.AddNode(graph, node);
 					return;
 				}
 				double distance = findDistance(node, candidate);
@@ -101,7 +101,7 @@ namespace AG
 				}
 			}
 			closestNode.nodeType = GameNode.NODE_TYPE.IN_RRT;
-			Utils.addNode(graph, closestNode);
+			Utils.AddNode(graph, closestNode);
 		}
 	
 		private static double findDistance(GameNode fromNode, GameNode toNode) 

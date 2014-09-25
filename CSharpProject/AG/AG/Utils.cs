@@ -5,8 +5,8 @@ using AG;
 
 namespace AG
 {
-	public enum BEST {TOTAL_HEALTH, ALL_ALIVE, PRIMARY_PLAYER}
-    public enum STRATEGY {RANDOM_ACTION, LOWEST_HP_TARGET, HIGHEST_ATTACK_TARGET, THREAT_TARGET}
+	public enum BEST {TOTAL_HEALTH, ALL_ALIVE, PRIMARY_PLAYER, ATTRITION}
+    public enum STRATEGY {RANDOM_ACTION, LOWEST_HP_TARGET, HIGHEST_ATTACK_TARGET, THREAT_TARGET, SLEEP1}
     
     public class Utils
     {
@@ -21,20 +21,21 @@ namespace AG
 			GameNode best = graph [0];
 
 			switch (bestType) {
-
+				
+			case BEST.ATTRITION:
 			case BEST.TOTAL_HEALTH:
 				int minNodeScore = int.MaxValue;
 				foreach (GameNode node in graph) {			
-					int val = Utils.getHealthSum (node.enemies);
+					int val = Utils.GetHealthSum (node.enemies);
 					if (minNodeScore > val) {
 						// 1st - enemies' health
 						minNodeScore = val;
 						best = node;
 					} else if (minNodeScore == val) {
-						if (Utils.getHealthSum (node.players) > Utils.getHealthSum (best.players)) {
+						if (Utils.GetHealthSum (node.players) > Utils.GetHealthSum (best.players)) {
 							// 2nd - players' health
 							best = node;
-						} else if (Utils.getHealthSum (node.players) == Utils.getHealthSum (best.players)) {
+						} else if (Utils.GetHealthSum (node.players) == Utils.GetHealthSum (best.players)) {
 							if (node.getRounds () < best.getRounds ()) {
 								// 3rd - # of rounds
 								best = node;
@@ -53,9 +54,9 @@ namespace AG
 					if (node.getNodeState() == GAME_STATE.PLAYER_WIN
 					    && IsAllAlive(node.players)) {
 						allAliveNodes.Add(node);
-						if (getHealthSum(node.players) > maxPlayerTeamHealth) {
+						if (GetHealthSum(node.players) > maxPlayerTeamHealth) {
 							best = node;
-							maxPlayerTeamHealth = getHealthSum(node.players);
+							maxPlayerTeamHealth = GetHealthSum(node.players);
 						}
 					}
 				}
@@ -76,7 +77,7 @@ namespace AG
 			if (state.getNodeState () != GAME_STATE.INPROCESS) {
 				childrenList.Add(state);
 			}
-			if (getHealthSum (state.players) == 0) {
+			if (GetHealthSum (state.players) == 0) {
 				return;
 			}
             if (playerIndex >= state.players.Count) {		
@@ -128,7 +129,7 @@ namespace AG
 			}
         }
 	
-        public static void addNode(List<GameNode> graph, GameNode n)
+        public static void AddNode(List<GameNode> graph, GameNode n)
         {
             // remove duplicates
             bool exist = false;
@@ -168,17 +169,20 @@ namespace AG
 			bool result = false;
 			switch (comparator) {
 			case BEST.TOTAL_HEALTH:
-				if (getHealthSum(nodeA.players) == getHealthSum(nodeB.players)
+				if (GetHealthSum(nodeA.players) == GetHealthSum(nodeB.players)
 				    && nodeA.getRounds() == nodeB.getRounds()){
 					result = true;
 				}
 				break;
 			case BEST.ALL_ALIVE:
 				if (IsAllAlive(nodeA.players) && IsAllAlive(nodeB.players)
-				    && getHealthSum(nodeA.players) == getHealthSum(nodeB.players)
+				    && GetHealthSum(nodeA.players) == GetHealthSum(nodeB.players)
 				    && nodeA.getRounds() == nodeB.getRounds()) {
 					result = true;
 				}
+				break;
+			case BEST.ATTRITION:
+				result = true;
 				break;
 			case BEST.PRIMARY_PLAYER:
 				break;
@@ -189,7 +193,7 @@ namespace AG
 			return result;
 		}
 
-        public static int getHealthSum(List<Character> characterList)
+        public static int GetHealthSum(List<Character> characterList)
         {
             int sum = 0;
             foreach (Character c in characterList)
@@ -199,7 +203,7 @@ namespace AG
             return sum;
         }
 		
-		public static int getMaxHealthSum(List<Character> characterList)
+		public static int GetMaxHealthSum(List<Character> characterList)
         {
             int sum = 0;
             foreach (Character c in characterList)
@@ -213,7 +217,7 @@ namespace AG
         
 
 		/******************** OUTPUT ********************/
-        public static void printToHTML(List<GameNode> graph, GameNode root) 
+        public static void PrintToHTML(List<GameNode> graph, GameNode root) 
         {
             foreach(GameNode n in graph)
             {
@@ -222,36 +226,36 @@ namespace AG
                     n.parent.rrtChildren.Add(n);
                 }
             }
-			string lines = outputGameState(root, 0);
+			string lines = OutputGameState(root, 0);
 			FileStream fcreate = File.Open("D:\\CSharpProject\\Visualization\\data.json", FileMode.Create);
             StreamWriter file = new StreamWriter(fcreate);
             file.WriteLine(lines);
             file.Close();
         }
         
-        private static string outputGameState(GameNode node, int level)
+        private static string OutputGameState(GameNode node, int level)
         {
-            string output = "\r\n" + indent(level) + "{\r\n";
+            string output = "\r\n" + Indent(level) + "{\r\n";
             
             level++;
-            output += indent(level) + "\"name\": \"" + node.ToString() + "\"";
+            output += Indent(level) + "\"name\": \"" + node.ToString() + "\"";
             switch (node.nodeType)
             {
                 case GameNode.NODE_TYPE.IN_EXPLORED:
                         
-                    output += ",\r\n" + indent(level) + "\"type\": " + "0";
+                    output += ",\r\n" + Indent(level) + "\"type\": " + "0";
                     break;
                 
                 case GameNode.NODE_TYPE.IN_RRT:
-                    output += ",\r\n" + indent(level) + "\"type\": " + "1";
+                    output += ",\r\n" + Indent(level) + "\"type\": " + "1";
                     break;    
                 
                 case GameNode.NODE_TYPE.IN_OPTIMAL:
-                    output += ",\r\n" + indent(level) + "\"type\": " + "2";
+                    output += ",\r\n" + Indent(level) + "\"type\": " + "2";
                     break;
                 
                 default:
-                    output += ",\r\n" + indent(level) + "\"type\": " + "0";
+                    output += ",\r\n" + Indent(level) + "\"type\": " + "0";
                     break;
                 
             }
@@ -259,12 +263,12 @@ namespace AG
             // Children recursion
             if (node.rrtChildren.Count > 0 || node.exploredChildren.Count > 0)
             {
-                output += ",\r\n" + indent(level) + "\"children\": " + "[";
+                output += ",\r\n" + Indent(level) + "\"children\": " + "[";
                 if (node.rrtChildren.Count > 0) 
                 {            
                     foreach (GameNode child in node.rrtChildren)
                     {
-                        output += "\t" + outputGameState(child, level) + ",";
+                        output += "\t" + OutputGameState(child, level) + ",";
                     }    
                 }
                 if (node.exploredChildren.Count > 0)
@@ -272,19 +276,19 @@ namespace AG
                     foreach (GameNode child in node.exploredChildren)
                     {
                         if (child.nodeType == GameNode.NODE_TYPE.IN_EXPLORED) {
-                            output += "\t" + outputGameState(child, level) + ",";
+                            output += "\t" + OutputGameState(child, level) + ",";
                         }
                     }
                 }
                 output = output.Substring(0, output.Length - 1);
-                output += "\r\n" + indent(level) + "]";
+                output += "\r\n" + Indent(level) + "]";
             }
-            output += "\r\n" + indent(level-1) + "}";
+            output += "\r\n" + Indent(level-1) + "}";
             return output;
         }
         
             
-        private static string indent(int level)
+        private static string Indent(int level)
         {
             string indent = "";
             for (int i = 0; i < level; i++) {
@@ -293,12 +297,12 @@ namespace AG
             return indent;
         }
         
-        public static void printNodePath(GameNode n, int count, List<GameNode> path)
+        public static void PrintNodePath(GameNode n, int count, List<GameNode> path)
         {
             if (n.parent != null)
             {
                 path.Add(n);
-                printNodePath(n.parent, ++count, path);
+                PrintNodePath(n.parent, ++count, path);
             } else {
                 path.Reverse();
                 

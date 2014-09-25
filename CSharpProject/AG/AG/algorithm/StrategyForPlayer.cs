@@ -23,11 +23,11 @@ namespace AG
 			if (aliveEnemyPointers.Count == 0) return action;
 			
 			/** Strategy implementation **/
+			List<Action> actionsAvailable = currentState.getAvailableActions(actionDealer);
 			switch(strategy)
 			{
 			case STRATEGY.RANDOM_ACTION:            
 				Random rand = new Random();
-				List<Action> actionsAvailable = currentState.getAvailableActions(actionDealer);
 				action = actionsAvailable[rand.Next(actionsAvailable.Count)];
 				break;        
 				
@@ -61,7 +61,7 @@ namespace AG
 				int maxThreatValue = int.MinValue;
 				foreach (int pp in aliveEnemyPointers)
 				{
-					int threatValue = currentState.enemies[pp].attack * (Utils.getHealthSum(currentState.enemies) - currentState.enemies[pp].health);
+					int threatValue = currentState.enemies[pp].attack * (Utils.GetHealthSum(currentState.enemies) - currentState.enemies[pp].health);
 					if (threatValue > maxThreatValue)
 					{
 						target = currentState.enemies[pp];
@@ -69,6 +69,20 @@ namespace AG
 					}
 				}
 				action = new Action(ACTION_TYPE.ATTACK, actionDealer, target);
+				break;
+			case STRATEGY.SLEEP1:
+				bool usingSleep = false;
+				foreach(Action a in actionsAvailable)
+				{
+					if (a.type == ACTION_TYPE.MAGIC) {
+						action  = a;
+						usingSleep = true;
+						break;
+					}
+				}
+				if (!usingSleep) {
+					goto case STRATEGY.THREAT_TARGET;
+				}
 				break;
 			}
 			

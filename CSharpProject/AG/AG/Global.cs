@@ -6,7 +6,7 @@ namespace AG
 	{
 		public static int POTION_HEAL = 6;
 		public static int CHILDREN_SAMPLING = 20; 
-		public static int MAX_ITERATION = 5000;
+		public static int MAX_ITERATION = 1000;
 	}
 }
 

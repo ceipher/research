@@ -18,7 +18,7 @@ namespace AG
 				RoundControl.RoundBegin(newState);
 				foreach(Character p in newState.players)
 				{
-					Action pAction = StrategyForPlayer.NextAction(p, STRATEGY.RANDOM_ACTION, newState);
+					Action pAction = StrategyForPlayer.NextAction(p, STRATEGY.SLEEP1, newState);
 					newState.doAction(pAction);
 					newState.playersAction.Add(pAction);
 				}

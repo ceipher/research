@@ -120,7 +120,7 @@ namespace AG
 				current = newState;
 			}
 			
-			return Utils.getHealthSum(current.players) / Utils.getMaxHealthSum(current.players);
+			return Utils.GetHealthSum(current.players) / Utils.GetMaxHealthSum(current.players);
 		}
 		
 		private static void Backup(GameNode v, float delta)
