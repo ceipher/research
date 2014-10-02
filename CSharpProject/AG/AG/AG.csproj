@@ -42,13 +42,14 @@
     <Compile Include="algorithm\MonteCarlo.cs" />
     <Compile Include="algorithm\Greedy.cs" />
     <Compile Include="algorithm\RRT.cs" />
-    <Compile Include="algorithmtest\SleepUseTest.cs" />
     <Compile Include="algorithm\StrategyForPlayer.cs" />
     <Compile Include="algorithm\StrategyForEnemy.cs" />
     <Compile Include="RoundControl.cs" />
     <Compile Include="GameNode.cs" />
     <Compile Include="algorithmtest\SleepUseCases.cs" />
     <Compile Include="algorithmtest\WinRateTest.cs" />
+    <Compile Include="algorithmtest\SleepTargetChoosingTest.cs" />
+    <Compile Include="algorithmtest\SleepUseOrNotTest_Coverage.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="algorithm\" />

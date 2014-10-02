@@ -6,6 +6,26 @@ namespace AG
 	public enum ACTION_TYPE {ATTACK, MAGIC, POTION, NONE};	
 	public enum DEBUFF {NONE, SLEEPING};
 
+	public class Magic 
+	{
+		public static Magic Sleep = new Magic ("Sleep", 0, 50, DEBUFF.SLEEPING, 8); 
+
+		public String name;
+		public int damage;
+		public int manaCost;
+		public DEBUFF debuff;
+		public int effectiveRounds;
+		public Magic(String pName, int pDamage, int pManaCost, DEBUFF pDebuff, int pEffectiveRounds)
+		{
+			name = pName;
+			damage = pDamage;
+			manaCost = pManaCost;
+			debuff = pDebuff;
+			effectiveRounds = pEffectiveRounds;
+		}
+		
+	}
+
 	public class Action
 	{
 		public ACTION_TYPE type;
@@ -47,24 +67,6 @@ namespace AG
 		}
 	}
 
-	public class Magic 
-	{
-		public String name;
-		public int damage;
-		public int manaCost;
-		public DEBUFF debuff;
-		public int effectiveRounds;
-		public Magic(String pName, int pDamage, int pManaCost, DEBUFF pDebuff, int pEffectiveRounds)
-		{
-			name = pName;
-			damage = pDamage;
-			manaCost = pManaCost;
-			debuff = pDebuff;
-			effectiveRounds = pEffectiveRounds;
-		}
-
-		public static Magic Sleep = new Magic ("Sleep", 0, 50, DEBUFF.SLEEPING, 2); 
-	}
 
 }
 

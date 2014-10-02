@@ -18,11 +18,8 @@ namespace AG
 		static int minAttack = A/4;
 		static int maxAttack = A*3;
 		static int attackStepSize = A/4;		
-		public WinRateTest ()
-		{
-		}
 
-		public static void run() {
+		public static void Run() {
 			for (int i = 0; minHealth+i*healthStepSize<=maxHealth; i++) {
 				for (int j = 0; minAttack+j*attackStepSize<=maxAttack; j++)	{
 					int testHealth = minHealth+healthStepSize*i;
@@ -97,7 +94,7 @@ namespace AG
 				fileContent += ("\r\n" + string.Join(" ", dataline));
 			}
 			fileContent += "\r\ne";
-			FileStream fcreate = File.Open("D:\\CSharpProject\\Visualization\\HeatMaps\\"+"H"+H
+			FileStream fcreate = File.Open("D:\\CSharpProject\\Visualization\\HeatMaps\\Winrate_"+"H"+H
 			                               +"A"+A+"_"+testAlgo+"_"+bestType.ToString()+".plt", FileMode.Create);
 			StreamWriter file = new StreamWriter(fcreate);
 			file.WriteLine(fileContent);

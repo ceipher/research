@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 namespace AG
 {
-	public class SleepUseTest
+	public class SleepTargetChoosingTest
 	{
 		static List<float[]> enemyXdata = new List<float[]> ();
 		static List<float[]> enemyTeamdata = new List<float[]> ();
@@ -16,13 +16,9 @@ namespace AG
 		static int maxAttack = A*3;
 		static int attackStepSize = A/4;
 
-		static int HMP = 1;
-		static int AMP = 1;
-		static int HME = 1;
-		static int AME = 1;
-		static BEST bestType = BEST.ATTRITION;
+		static BEST bestType = BEST.TOTAL_HEALTH;
 
-		public static void GenerateHeapMap()
+		public static void Run()
 		{
 			for (int i = 0; minHealth+i*healthStepSize<=maxHealth; i++) {
 				for (int j = 0; minAttack+j*attackStepSize<=maxAttack; j++)	{
@@ -30,13 +26,13 @@ namespace AG
 					int testAttack = minAttack+attackStepSize*j;
 					Console.WriteLine("i:"+i+" j:"+j);
 					List<Character> players = new List<Character>();
-					players.Add (new Character(H*HMP,A*AMP,"P1", new List<Magic> (new Magic[] {Magic.Sleep})));
-					players.Add (new Character(H*HMP,A*AMP,"P2"));
-					//players.Add (new Character(H*HMP,A*AMP,"P3"));
+					players.Add (new Character(H,A,"P1", new List<Magic> (new Magic[] {Magic.Sleep})));
+					players.Add (new Character(H,A,"P2"));
+					players.Add (new Character(H,A,"P3"));
 					List<Character> enemies = new List<Character>();
 					enemies.Add (new Character(testHealth,testAttack,"E1"));
-					enemies.Add (new Character(H*HME,A*AME,"E2"));
-					//enemies.Add (new Character(H*HME,A*AME,"E3"));
+					enemies.Add (new Character(H,A,"E2"));
+					enemies.Add (new Character(H,A,"E3"));
 					FillBFSearchData(i, j, players, enemies);
 				}
 			}
@@ -75,7 +71,7 @@ namespace AG
 			}
 			fileContent += "\r\ne";
 			fileContent += "\r\nunset multiplot";
-			FileStream fcreate = File.Open("D:\\CSharpProject\\Visualization\\HeatMaps\\"+"H"+H
+			FileStream fcreate = File.Open("D:\\CSharpProject\\Visualization\\HeatMaps\\SleepProb_"+"H"+H
 			                               +"A"+A+"_"+bestType.ToString()+".plt", FileMode.Create);
 			StreamWriter file = new StreamWriter(fcreate);
 			file.WriteLine(fileContent);

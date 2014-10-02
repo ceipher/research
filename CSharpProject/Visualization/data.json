@@ -1,50 +1,22 @@
 
 {
-	"name": "p[0-12-12-]-e[0-12-12-]-potions[0] PlayerTeam: 24 EnemyTeam: 24",
+	"name": "p[0-12-12-]-e[0-7-13-]-potions[0] PlayerTeam: 24 EnemyTeam: 20",
 	"type": 2,
 	"children": [	
 	{
-		"name": "p[0-4-12-]-e[0-0-12-]-potions[0] PlayerTeam: 16 EnemyTeam: 12",
+		"name": "p[0-6-12-]-e[0-0-13-]-potions[0] PlayerTeam: 18 EnemyTeam: 13",
 		"type": 2,
 		"children": [	
 		{
-			"name": "p[0-4-12-]-e[0-0-0-]-potions[0] PlayerTeam: 16 EnemyTeam: 0",
-			"type": 2
-		},	
-		{
-			"name": "p[0-4-12-]-e[0-0-0-]-potions[0] PlayerTeam: 16 EnemyTeam: 0",
-			"type": 2
-		}
-		]
-	},	
-	{
-		"name": "p[0-0-12-]-e[0-4-4-]-potions[0] PlayerTeam: 12 EnemyTeam: 8",
-		"type": 2,
-		"children": [	
-		{
-			"name": "p[0-0-4-]-e[0-0-4-]-potions[0] PlayerTeam: 4 EnemyTeam: 4",
+			"name": "p[0-0-12-]-e[0-0-1-]-potions[0] PlayerTeam: 12 EnemyTeam: 1",
 			"type": 2,
 			"children": [	
 			{
-				"name": "p[0-0-4-]-e[0-0-0-]-potions[0] PlayerTeam: 4 EnemyTeam: 0",
+				"name": "p[0-0-12-]-e[0-0-0-]-potions[0] PlayerTeam: 12 EnemyTeam: 0",
 				"type": 2
 			},	
 			{
-				"name": "p[0-0-4-]-e[0-0-0-]-potions[0] PlayerTeam: 4 EnemyTeam: 0",
-				"type": 2
-			}
-			]
-		},	
-		{
-			"name": "p[0-0-4-]-e[0-4-0-]-potions[0] PlayerTeam: 4 EnemyTeam: 4",
-			"type": 2,
-			"children": [	
-			{
-				"name": "p[0-0-4-]-e[0-0-0-]-potions[0] PlayerTeam: 4 EnemyTeam: 0",
-				"type": 2
-			},	
-			{
-				"name": "p[0-0-4-]-e[0-0-0-]-potions[0] PlayerTeam: 4 EnemyTeam: 0",
+				"name": "p[0-0-12-]-e[0-0-0-]-potions[0] PlayerTeam: 12 EnemyTeam: 0",
 				"type": 2
 			}
 			]
@@ -52,50 +24,62 @@
 		]
 	},	
 	{
-		"name": "p[0-0-12-]-e[0-4-4-]-potions[0] PlayerTeam: 12 EnemyTeam: 8",
-		"type": 2,
+		"name": "p[0-0-12-]-e[0-1-7-]-potions[0] PlayerTeam: 12 EnemyTeam: 8",
+		"type": 0,
 		"children": [	
 		{
-			"name": "p[0-0-4-]-e[0-0-4-]-potions[0] PlayerTeam: 4 EnemyTeam: 4",
-			"type": 2,
+			"name": "p[0-0-6-]-e[0-0-7-]-potions[0] PlayerTeam: 6 EnemyTeam: 7",
+			"type": 0,
 			"children": [	
 			{
-				"name": "p[0-0-4-]-e[0-0-0-]-potions[0] PlayerTeam: 4 EnemyTeam: 0",
-				"type": 2
-			},	
-			{
-				"name": "p[0-0-4-]-e[0-0-0-]-potions[0] PlayerTeam: 4 EnemyTeam: 0",
-				"type": 2
+				"name": "p[0-0-0-]-e[0-0-1-]-potions[0] PlayerTeam: 0 EnemyTeam: 1",
+				"type": 0
 			}
 			]
 		},	
 		{
-			"name": "p[0-0-4-]-e[0-4-0-]-potions[0] PlayerTeam: 4 EnemyTeam: 4",
-			"type": 2,
-			"children": [	
-			{
-				"name": "p[0-0-4-]-e[0-0-0-]-potions[0] PlayerTeam: 4 EnemyTeam: 0",
-				"type": 2
-			},	
-			{
-				"name": "p[0-0-4-]-e[0-0-0-]-potions[0] PlayerTeam: 4 EnemyTeam: 0",
-				"type": 2
-			}
-			]
+			"name": "p[0-0-0-]-e[0-1-1-]-potions[0] PlayerTeam: 0 EnemyTeam: 2",
+			"type": 0
 		}
 		]
 	},	
 	{
-		"name": "p[0-4-12-]-e[0-12-0-]-potions[0] PlayerTeam: 16 EnemyTeam: 12",
-		"type": 2,
+		"name": "p[0-0-12-]-e[0-1-7-]-potions[0] PlayerTeam: 12 EnemyTeam: 8",
+		"type": 0,
 		"children": [	
 		{
-			"name": "p[0-4-12-]-e[0-0-0-]-potions[0] PlayerTeam: 16 EnemyTeam: 0",
-			"type": 2
+			"name": "p[0-0-6-]-e[0-0-7-]-potions[0] PlayerTeam: 6 EnemyTeam: 7",
+			"type": 0,
+			"children": [	
+			{
+				"name": "p[0-0-0-]-e[0-0-1-]-potions[0] PlayerTeam: 0 EnemyTeam: 1",
+				"type": 0
+			}
+			]
 		},	
 		{
-			"name": "p[0-4-12-]-e[0-0-0-]-potions[0] PlayerTeam: 16 EnemyTeam: 0",
-			"type": 2
+			"name": "p[0-0-0-]-e[0-1-1-]-potions[0] PlayerTeam: 0 EnemyTeam: 2",
+			"type": 0
+		}
+		]
+	},	
+	{
+		"name": "p[0-0-12-]-e[0-7-1-]-potions[0] PlayerTeam: 12 EnemyTeam: 8",
+		"type": 0,
+		"children": [	
+		{
+			"name": "p[0-0-0-]-e[0-1-1-]-potions[0] PlayerTeam: 0 EnemyTeam: 2",
+			"type": 0
+		},	
+		{
+			"name": "p[0-0-6-]-e[0-7-0-]-potions[0] PlayerTeam: 6 EnemyTeam: 7",
+			"type": 0,
+			"children": [	
+			{
+				"name": "p[0-0-0-]-e[0-1-0-]-potions[0] PlayerTeam: 0 EnemyTeam: 1",
+				"type": 0
+			}
+			]
 		}
 		]
 	}

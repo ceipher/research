@@ -161,7 +161,8 @@ namespace AG
 		 */
 		public static bool IsWinAsGoodAs(GameNode nodeA, GameNode nodeB, BEST comparator) 
 		{
-			if (nodeA.getNodeState () != GAME_STATE.PLAYER_WIN ||
+			if (nodeA == null || nodeB == null ||
+			    nodeA.getNodeState () != GAME_STATE.PLAYER_WIN ||
 				nodeB.getNodeState () != GAME_STATE.PLAYER_WIN) {
 				return false;
 			}
